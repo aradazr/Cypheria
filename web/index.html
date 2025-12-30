@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -18,21 +19,47 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Cypheria - Secure Text Encoder & Decoder. Works offline!">
 
-  <!-- iOS meta tags & icons -->
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#6366F1">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="text_encoder">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Cypheria">
+  <meta name="msapplication-TileColor" content="#6366F1">
+  <meta name="msapplication-config" content="/browserconfig.xml">
+
+  <!-- iOS Icons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="icons/Icon-512.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png" />
 
-  <title>text_encoder</title>
+  <title>Cypheria</title>
   <link rel="manifest" href="manifest.json">
 </head>
+
 <body>
+  <script>
+    // Register Service Worker for offline functionality
+    // Flutter will generate its own service worker, but we register ours as fallback
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        // Try to register custom service worker
+        navigator.serviceWorker.register('./sw.js')
+          .then((registration) => {
+            console.log('Custom SW registered: ', registration);
+          })
+          .catch((registrationError) => {
+            console.log('Custom SW registration failed, using Flutter SW: ', registrationError);
+          });
+      });
+    }
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
+
 </html>

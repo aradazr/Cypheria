@@ -1,13 +1,17 @@
 {
-    "name": "Cypheria",
+    "name": "Cypheria - Secure Text Encoder",
     "short_name": "Cypheria",
-    "start_url": ".",
+    "start_url": "/",
+    "scope": "/",
     "display": "standalone",
     "background_color": "#121212",
     "theme_color": "#6366F1",
-    "description": "Cypheria - Secure Text Encoder & Decoder",
+    "description": "Cypheria - Secure Text Encoder & Decoder. Works completely offline!",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
+    "categories": ["utilities", "security", "productivity"],
+    "dir": "rtl",
+    "lang": "fa",
     "icons": [
         {
             "src": "icons/Icon-192.png",
