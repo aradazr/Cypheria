@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/utils/responsive.dart';
+import '../../core/localization/app_localizations.dart';
 import '../providers/language_provider.dart';
 import '../providers/theme_provider.dart';
+import '../providers/onboarding_provider.dart';
+import '../providers/showcase_provider.dart';
+import '../widgets/app_wrapper.dart';
 
 class SettingsBar extends StatelessWidget {
   const SettingsBar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     return Container(
       padding: Responsive.padding(
         context,
@@ -54,6 +59,29 @@ class SettingsBar extends StatelessWidget {
                 tooltip: themeProvider.isDarkMode
                     ? 'Switch to Light Mode'
                     : 'تغییر به تم دارک',
+                iconSize: Responsive.iconSize(context, 22, 24, 26),
+              );
+            },
+          ),
+          SizedBox(width: Responsive.spacing(context, 6, 8, 10)),
+          // Help/Showcase Button
+          Consumer2<OnboardingProvider, ShowcaseProvider>(
+            builder: (context, onboardingProvider, showcaseProvider, child) {
+              return IconButton(
+                onPressed: () {
+                  // Reset both onboarding and showcase
+                  onboardingProvider.resetOnboarding();
+                  showcaseProvider.resetShowcase();
+                  
+                  // Reset will trigger rebuild and show onboarding/showcase
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (_) => const AppWrapper(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.help_outline),
+                tooltip: localizations?.skip ?? 'Show Help',
                 iconSize: Responsive.iconSize(context, 22, 24, 26),
               );
             },

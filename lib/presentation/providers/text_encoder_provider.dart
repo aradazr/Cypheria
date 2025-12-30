@@ -74,9 +74,13 @@ class TextEncoderProvider extends ChangeNotifier {
 
       _errorMessage = null;
     } catch (e) {
-      _errorMessage = context != null
-          ? 'Error: ${e.toString()}'
-          : 'خطا در پردازش: ${e.toString()}';
+      // Extract error message from exception
+      String errorMsg = e.toString();
+      if (errorMsg.startsWith('Exception: ')) {
+        errorMsg = errorMsg.substring(11); // Remove 'Exception: ' prefix
+      }
+      
+      _errorMessage = errorMsg;
       _outputText = '';
     } finally {
       _isProcessing = false;

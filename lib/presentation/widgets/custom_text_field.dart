@@ -65,11 +65,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
         Text(
           widget.label,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: Theme.of(context).textTheme.bodyLarge?.color,
-                fontWeight: FontWeight.w500,
-                fontSize: Responsive.fontSize(context, 14, 16, 18),
-                fontFamily: 'PelakFA',
-              ),
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+            fontWeight: FontWeight.w500,
+            fontSize: Responsive.fontSize(context, 14, 16, 18),
+            fontFamily: 'PelakFA',
+          ),
         ),
         SizedBox(height: Responsive.spacing(context, 6, 8, 10)),
         TextField(
@@ -77,9 +77,22 @@ class _CustomTextFieldState extends State<CustomTextField> {
           onChanged: widget.onChanged,
           obscureText: widget.obscureText,
           maxLines: widget.maxLines,
-          textInputAction: widget.textInputAction,
+          textInputAction: widget.textInputAction ?? TextInputAction.done,
           readOnly: widget.readOnly,
-          onSubmitted: widget.onSubmitted != null ? (_) => widget.onSubmitted!() : null,
+          onSubmitted: widget.onSubmitted != null
+              ? (_) => widget.onSubmitted!()
+              : null,
+          keyboardType: widget.obscureText
+              ? TextInputType.visiblePassword
+              : TextInputType.text,
+          textCapitalization: TextCapitalization.none,
+          inputFormatters: [
+            // Allow all characters including Persian/Unicode
+            // Using a custom formatter that accepts all Unicode characters
+            _UnicodeTextInputFormatter(),
+          ],
+          // Enable IME composition for better support of non-Latin scripts
+          enableIMEPersonalizedLearning: true,
           style: TextStyle(
             color: Theme.of(context).textTheme.bodyLarge?.color,
             fontSize: Responsive.fontSize(context, 14, 16, 18),
@@ -88,6 +101,12 @@ class _CustomTextFieldState extends State<CustomTextField> {
           textDirection: Localizations.localeOf(context).languageCode == 'fa'
               ? TextDirection.rtl
               : TextDirection.ltr,
+          enableSuggestions: !widget.obscureText,
+          autocorrect: !widget.obscureText,
+          smartDashesType: SmartDashesType.disabled,
+          smartQuotesType: SmartQuotesType.disabled,
+          // Force text input to accept all characters
+          buildCounter: null,
           decoration: InputDecoration(
             hintText: widget.hint,
             hintStyle: TextStyle(
@@ -101,7 +120,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               horizontal: 16,
               vertical: Responsive.spacing(context, 14, 16, 18),
             ),
-            suffixIcon: _controller.text.isNotEmpty && !widget.readOnly
+            suffixIcon: _controller.text.isNotEmpty
                 ? IconButton(
                     icon: Icon(
                       Icons.copy,
@@ -112,13 +131,12 @@ class _CustomTextFieldState extends State<CustomTextField> {
                       Clipboard.setData(ClipboardData(text: _controller.text));
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(
-                            localizations?.copied ?? 'Copied',
-                          ),
+                          content: Text(localizations?.copied ?? 'Copied'),
                           duration: const Duration(seconds: 1),
                         ),
                       );
                     },
+                    tooltip: localizations?.copied ?? 'Copy',
                   )
                 : null,
           ),
@@ -128,3 +146,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
   }
 }
 
+// Custom TextInputFormatter to allow all Unicode characters including Persian
+class _UnicodeTextInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // Allow all characters (no filtering)
+    return newValue;
+  }
+}

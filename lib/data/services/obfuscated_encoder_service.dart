@@ -50,8 +50,22 @@ class ObfuscatedEncoderService {
     if (encodedText.isEmpty) return '';
     if (key.isEmpty) key = 'default';
 
+    // Clean the encoded text (remove whitespace)
+    final cleanedText = encodedText.trim().replaceAll(RegExp(r'\s+'), '');
+    
+    // Validate Base64 format
+    if (cleanedText.isEmpty) {
+      throw Exception('متن رمزگذاری شده خالی است');
+    }
+
     try {
-      final encrypted = enc.Encrypted.fromBase64(encodedText);
+      // Validate Base64 characters
+      final base64Regex = RegExp(r'^[A-Za-z0-9+/=]+$');
+      if (!base64Regex.hasMatch(cleanedText)) {
+        throw Exception('فرمت متن رمزگذاری شده معتبر نیست. لطفاً متن رمزگذاری شده صحیح را وارد کنید.');
+      }
+
+      final encrypted = enc.Encrypted.fromBase64(cleanedText);
       final keyMaterial = _prepareKeyMaterial(key);
       final vector = _prepareVector(key);
       final transformer = enc.Encrypter(
@@ -59,8 +73,16 @@ class ObfuscatedEncoderService {
       );
       final reversed = transformer.decrypt(encrypted, iv: vector);
       return reversed;
+    } on FormatException {
+      throw Exception('فرمت متن رمزگذاری شده معتبر نیست. لطفاً متن رمزگذاری شده صحیح را وارد کنید.');
+    } on ArgumentError {
+      throw Exception('کلید رمزگذاری اشتباه است یا متن رمزگذاری شده با این کلید رمزگذاری نشده است.');
     } catch (e) {
-      throw Exception('Reverse transformation failed: $e');
+      final errorMsg = e.toString().toLowerCase();
+      if (errorMsg.contains('invalid') || errorMsg.contains('argument')) {
+        throw Exception('کلید رمزگذاری اشتباه است یا متن رمزگذاری شده با این کلید رمزگذاری نشده است.');
+      }
+      throw Exception('خطا در رمزگشایی: ${e.toString()}');
     }
   }
 }
