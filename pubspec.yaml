@@ -39,7 +39,6 @@ dependencies:
   provider: ^6.1.1
   encrypt: ^5.0.3
   shared_preferences: ^2.2.2
-  showcaseview: ^5.0.1
 
 dev_dependencies:
   flutter_test:

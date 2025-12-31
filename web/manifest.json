@@ -9,7 +9,11 @@
     "description": "Cypheria - Secure Text Encoder & Decoder. Works completely offline!",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
-    "categories": ["utilities", "security", "productivity"],
+    "categories": [
+        "utilities",
+        "security",
+        "productivity"
+    ],
     "dir": "rtl",
     "lang": "fa",
     "icons": [

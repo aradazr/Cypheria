@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/onboarding_provider.dart';
-import '../providers/showcase_provider.dart';
 import '../screens/onboarding_screen.dart';
 import '../screens/home_screen.dart';
 
@@ -16,10 +15,10 @@ class _AppWrapperState extends State<AppWrapper> {
   @override
   void initState() {
     super.initState();
-    // Load onboarding and showcase status when widget initializes
+    // Load onboarding status when widget initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       context.read<OnboardingProvider>().loadOnboardingStatus();
-      context.read<ShowcaseProvider>().loadShowcaseStatus();
     });
   }
 

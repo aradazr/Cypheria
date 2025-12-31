@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:showcaseview/showcaseview.dart';
 import 'core/theme/app_theme.dart';
 import 'core/localization/app_localizations.dart';
 import 'presentation/providers/text_encoder_provider.dart';
 import 'presentation/providers/language_provider.dart';
 import 'presentation/providers/theme_provider.dart';
 import 'presentation/providers/onboarding_provider.dart';
-import 'presentation/providers/showcase_provider.dart';
 import 'presentation/widgets/app_wrapper.dart';
 
 void main() {
@@ -26,7 +24,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => OnboardingProvider()),
-        ChangeNotifierProvider(create: (_) => ShowcaseProvider()),
       ],
       child: Consumer2<LanguageProvider, ThemeProvider>(
         builder: (context, languageProvider, themeProvider, child) {
@@ -45,10 +42,6 @@ class MyApp extends StatelessWidget {
             ],
             supportedLocales: const [Locale('fa', 'IR'), Locale('en', 'US')],
             home: const AppWrapper(),
-            builder: (context, child) {
-              ShowcaseView.register();
-              return child!;
-            },
           );
         },
       ),

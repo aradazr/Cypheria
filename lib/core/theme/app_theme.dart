@@ -78,11 +78,17 @@ class AppTheme {
           textStyle: const TextStyle(fontFamily: 'PelakFA'),
         ),
       ),
-      snackBarTheme: const SnackBarThemeData(
-        contentTextStyle: TextStyle(
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: const Color(0xFF1E1E2E),
+        contentTextStyle: const TextStyle(
           fontFamily: 'PelakFA',
           color: Colors.white,
+          fontSize: 14,
         ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        behavior: SnackBarBehavior.floating,
       ),
       fontFamily: 'PelakFA',
       textTheme: const TextTheme(
@@ -184,11 +190,17 @@ class AppTheme {
           side: BorderSide(color: Colors.grey.shade300),
         ),
       ),
-      snackBarTheme: const SnackBarThemeData(
-        contentTextStyle: TextStyle(
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: const Color(0xFF323232),
+        contentTextStyle: const TextStyle(
           fontFamily: 'PelakFA',
           color: Colors.white,
+          fontSize: 14,
         ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        behavior: SnackBarBehavior.floating,
       ),
       fontFamily: 'PelakFA',
       textTheme: const TextTheme(

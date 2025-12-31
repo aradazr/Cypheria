@@ -5,7 +5,6 @@ import '../../core/localization/app_localizations.dart';
 import '../providers/language_provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/onboarding_provider.dart';
-import '../providers/showcase_provider.dart';
 import '../widgets/app_wrapper.dart';
 
 class SettingsBar extends StatelessWidget {
@@ -64,16 +63,15 @@ class SettingsBar extends StatelessWidget {
             },
           ),
           SizedBox(width: Responsive.spacing(context, 6, 8, 10)),
-          // Help/Showcase Button
-          Consumer2<OnboardingProvider, ShowcaseProvider>(
-            builder: (context, onboardingProvider, showcaseProvider, child) {
+          // Help/Onboarding Button
+          Consumer<OnboardingProvider>(
+            builder: (context, onboardingProvider, child) {
               return IconButton(
                 onPressed: () {
-                  // Reset both onboarding and showcase
+                  // Reset onboarding
                   onboardingProvider.resetOnboarding();
-                  showcaseProvider.resetShowcase();
                   
-                  // Reset will trigger rebuild and show onboarding/showcase
+                  // Reset will trigger rebuild and show onboarding
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (_) => const AppWrapper(),
