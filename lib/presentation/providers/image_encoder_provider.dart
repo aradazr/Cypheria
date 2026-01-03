@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../data/services/image_service.dart';
-import '../../core/localization/app_localizations.dart';
 
 class ImageEncoderProvider extends ChangeNotifier {
   bool _isEncoding = true;
@@ -24,20 +23,6 @@ class ImageEncoderProvider extends ChangeNotifier {
     // Swap input and output when toggling
 
     notifyListeners();
-  }
-
-  String _getLocalizedError(BuildContext context, String key) {
-    try {
-      final localizations = AppLocalizations.of(context);
-      if (localizations != null) {
-        return key == 'pleaseEnterText'
-            ? localizations.pleaseEnterText
-            : localizations.pleaseEnterKey;
-      }
-      return 'Error';
-    } catch (e) {
-      return 'Error';
-    }
   }
 
   Future<void> pickImageToEncode() async {
