@@ -10,6 +10,8 @@ class TextEncoderProvider extends ChangeNotifier {
   String _key = '';
   String _outputText = '';
   bool _isEncoding = true;
+  bool _isEncodingImage = false;
+
   bool _isProcessing = false;
   String? _errorMessage;
 
@@ -17,6 +19,8 @@ class TextEncoderProvider extends ChangeNotifier {
   String get key => _key;
   String get outputText => _outputText;
   bool get isEncoding => _isEncoding;
+  bool get isEncodingImage => _isEncodingImage;
+
   bool get isProcessing => _isProcessing;
   String? get errorMessage => _errorMessage;
 
@@ -42,6 +46,11 @@ class TextEncoderProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void toggleTab() {
+    _isEncodingImage = !_isEncodingImage;
+    notifyListeners();
+  }
+
   Future<void> process(BuildContext? context) async {
     if (_inputText.isEmpty) {
       _errorMessage = context != null
@@ -64,7 +73,9 @@ class TextEncoderProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(milliseconds: 100)); // Small delay for UX
+      await Future.delayed(
+        const Duration(milliseconds: 100),
+      ); // Small delay for UX
 
       if (_isEncoding) {
         _outputText = _repository.encode(_inputText, _key);
@@ -79,7 +90,7 @@ class TextEncoderProvider extends ChangeNotifier {
       if (errorMsg.startsWith('Exception: ')) {
         errorMsg = errorMsg.substring(11); // Remove 'Exception: ' prefix
       }
-      
+
       _errorMessage = errorMsg;
       _outputText = '';
     } finally {
@@ -117,4 +128,3 @@ class TextEncoderProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
-
