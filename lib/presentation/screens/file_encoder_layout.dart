@@ -1,36 +1,24 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:text_encoder/presentation/providers/image_encoder_provider.dart';
+import 'package:text_encoder/presentation/providers/file_encoder_provider.dart';
 
 import '../../core/localization/app_localizations.dart';
 import '../../core/utils/responsive.dart';
 import '../widgets/mode_switch_button.dart';
 
-class ImageEncoderLayout extends StatelessWidget {
-  const ImageEncoderLayout({super.key});
+class FileEncoderLayout extends StatelessWidget {
+  const FileEncoderLayout({super.key});
 
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
 
-    return Consumer<ImageEncoderProvider>(
+    return Consumer<FileEncoderProvider>(
       builder: (context, provider, child) {
         final isEncoding = provider.isEncoding;
-
-        // For encoding: use original image for display, not encrypted file
-        // For decoding: use decoded image (which is a valid PNG)
-        final displayImage = isEncoding
-            ? (provider.isEncoded
-                ? provider.originalImageToEncode
-                : provider.selectedImageToEncode)
-            : provider.selectedImageToDecode;
-
         final isLoading = isEncoding
             ? provider.isLoadingEncode
             : provider.isLoadingDecode;
-
         final isDone = isEncoding ? provider.isEncoded : provider.isDecoded;
 
         return Column(
@@ -93,18 +81,18 @@ class ImageEncoderLayout extends StatelessWidget {
 
             SizedBox(height: Responsive.spacing(context, 10, 12, 14)),
 
-            _imagePicker(
+            _filePicker(
               context: context,
-              image: displayImage,
+              fileName: provider.selectedFileName,
               hintText: isEncoding
-                  ? localizations.uploadImageToEncode
-                  : localizations.uploadImageToDecode,
+                  ? localizations.uploadFileToEncode
+                  : localizations.uploadFileToDecode,
               onPick: isEncoding
-                  ? provider.pickImageToEncode
-                  : provider.pickImageToDecode,
+                  ? provider.pickFileToEncode
+                  : provider.pickFileToDecode,
               onClear: isEncoding
-                  ? provider.clearImageToEncode
-                  : provider.clearImageToDecode,
+                  ? provider.clearFileToEncode
+                  : provider.clearFileToDecode,
               isEncoded: isEncoding && provider.isEncoded,
             ),
 
@@ -121,42 +109,40 @@ class ImageEncoderLayout extends StatelessWidget {
                   ? null
                   : () {
                       if (isEncoding) {
-                        // Use original image if encoded, otherwise use selected image
-                        final fileToEncode = provider.isEncoded && provider.originalImageToEncode != null
-                            ? provider.originalImageToEncode!
-                            : provider.selectedImageToEncode;
+                        final fileToEncode = provider.isEncoded && provider.originalFileToEncode != null
+                            ? provider.originalFileToEncode!
+                            : provider.selectedFileToEncode;
                         
                         if (fileToEncode == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(localizations.pleaseSelectImage),
+                              content: Text(localizations.pleaseSelectFile),
                               duration: const Duration(seconds: 2),
                             ),
                           );
                           return;
                         }
 
-                        provider.encodeImage(
+                        provider.encodeFile(
                           fileToEncode,
                           provider.keyController.text,
                         );
                       } else {
-                        // Use encrypted file if decoded, otherwise use selected image
-                        final fileToDecode = provider.isDecoded && provider.originalImageToDecode != null
-                            ? provider.originalImageToDecode!
-                            : provider.selectedImageToDecode;
+                        final fileToDecode = provider.isDecoded && provider.originalFileToDecode != null
+                            ? provider.originalFileToDecode!
+                            : provider.selectedFileToDecode;
                         
                         if (fileToDecode == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(localizations.pleaseSelectImage),
+                              content: Text(localizations.pleaseSelectFile),
                               duration: const Duration(seconds: 2),
                             ),
                           );
                           return;
                         }
 
-                        provider.decodeImage(
+                        provider.decodeFile(
                           fileToDecode,
                           provider.keyController.text,
                         );
@@ -169,18 +155,18 @@ class ImageEncoderLayout extends StatelessWidget {
             if (isDone)
               _saveButton(
                 context: context,
-                text: localizations.saveToGallery,
+                text: localizations.saveFile,
                 onPressed: () async {
                   if (isEncoding) {
-                    await provider.saveEncodedImage();
+                    await provider.saveEncodedFile(localizations.saveEncryptedFileDialog);
                   } else {
-                    await provider.saveDecodedImage();
+                    await provider.saveDecodedFile(localizations.saveDecryptedFileDialog);
                   }
 
                   if (provider.errorMessage == null && context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(localizations.savedToGallery),
+                        content: Text(localizations.savedFile),
                         duration: const Duration(seconds: 1),
                       ),
                     );
@@ -197,9 +183,9 @@ class ImageEncoderLayout extends StatelessWidget {
   // Widgets (LOCAL HELPERS)
   // ===========================
 
-  Widget _imagePicker({
+  Widget _filePicker({
     required BuildContext context,
-    required File? image,
+    required String? fileName,
     required String hintText,
     required VoidCallback onPick,
     required VoidCallback onClear,
@@ -208,30 +194,29 @@ class ImageEncoderLayout extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
     
     return Container(
-      height: Responsive.height(context, 350),
+      height: Responsive.height(context, 200),
       decoration: BoxDecoration(
-        color: image == null ? const Color(0xFF1E1E2E) : Colors.transparent,
-        border: image == null
-            ? Border.all(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey.shade800
-                    : Colors.grey.shade300,
-              )
-            : Border.all(color: Colors.transparent),
+        color: fileName == null ? const Color(0xFF1E1E2E) : Theme.of(context).cardColor,
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey.shade800
+              : Colors.grey.shade300,
+        ),
         borderRadius: BorderRadius.circular(
           Responsive.borderRadius(context, 12, 16, 20),
         ),
       ),
-      child: Center(
-        child: InkWell(
-          onTap: image == null ? onPick : null,
-          child: image == null
-              ? Column(
+      child: fileName == null
+          ? InkWell(
+              onTap: onPick,
+              child: Center(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.upload,
-                      size: Responsive.fontSize(context, 100, 120, 140),
+                      Icons.upload_file,
+                      size: Responsive.fontSize(context, 60, 70, 80),
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     SizedBox(height: Responsive.spacing(context, 16, 20, 24)),
                     Padding(
@@ -246,88 +231,51 @@ class ImageEncoderLayout extends StatelessWidget {
                       ),
                     ),
                   ],
-                )
-              : Stack(
-                  alignment: Alignment.topLeft,
-                  children: [
-                    // Display the original image with overlay if encrypted
-                    Image.file(
-                      image,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        // If image fails to load (encrypted file in decode mode), show placeholder
-                        return Container(
-                          height: Responsive.height(context, 350),
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).cardColor,
-                            borderRadius: BorderRadius.circular(
-                              Responsive.borderRadius(context, 12, 16, 20),
-                            ),
+                ),
+              ),
+            )
+          : Stack(
+              alignment: Alignment.topLeft,
+              children: [
+                Padding(
+                  padding: Responsive.padding(context, all: 16),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.insert_drive_file,
+                            size: Responsive.iconSize(context, 32, 36, 40),
+                            color: Theme.of(context).colorScheme.primary,
                           ),
-                          child: Center(
-                            child: Padding(
-                              padding: Responsive.padding(context, horizontal: 16),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.lock,
-                                    size: Responsive.fontSize(context, 80, 100, 120),
-                                    color: Theme.of(context).colorScheme.primary,
-                                  ),
-                                  SizedBox(
-                                    height: Responsive.spacing(context, 16, 20, 24),
-                                  ),
-                                  Text(
-                                    localizations.encryptedFileSelected,
-                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      fontSize: Responsive.fontSize(context, 14, 16, 18),
-                                      fontFamily: 'PelakFA',
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  SizedBox(
-                                    height: Responsive.spacing(context, 8, 10, 12),
-                                  ),
-                                  Text(
-                                    localizations.decryptToView,
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Colors.grey,
-                                      fontSize: Responsive.fontSize(context, 12, 14, 16),
-                                      fontFamily: 'PelakFA',
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
+                          SizedBox(width: Responsive.spacing(context, 12, 14, 16)),
+                          Expanded(
+                            child: Text(
+                              fileName,
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                fontSize: Responsive.fontSize(context, 14, 16, 18),
+                                fontFamily: 'PelakFA',
                               ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
                             ),
                           ),
-                        );
-                      },
-                    ),
-                    // Overlay badge if encrypted
-                    if (isEncoded)
-                      Positioned(
-                        top: Responsive.spacing(context, 10, 12, 14),
-                        right: Responsive.spacing(context, 10, 12, 14),
-                        child: Container(
+                        ],
+                      ),
+                      if (isEncoded) ...[
+                        SizedBox(height: Responsive.spacing(context, 8, 10, 12)),
+                        Container(
                           padding: EdgeInsets.symmetric(
                             horizontal: Responsive.spacing(context, 12, 14, 16),
                             vertical: Responsive.spacing(context, 6, 8, 10),
                           ),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.9),
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(
                               Responsive.borderRadius(context, 20, 24, 28),
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.3),
-                                blurRadius: Responsive.spacing(context, 8, 10, 12),
-                                offset: Offset(0, Responsive.spacing(context, 2, 2, 3)),
-                              ),
-                            ],
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -335,13 +283,13 @@ class ImageEncoderLayout extends StatelessWidget {
                               Icon(
                                 Icons.lock,
                                 size: Responsive.iconSize(context, 16, 18, 20),
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                               SizedBox(width: Responsive.spacing(context, 4, 5, 6)),
                               Text(
                                 localizations.encrypted,
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.primary,
                                   fontSize: Responsive.fontSize(context, 12, 14, 16),
                                   fontWeight: FontWeight.w600,
                                   fontFamily: 'PelakFA',
@@ -350,35 +298,35 @@ class ImageEncoderLayout extends StatelessWidget {
                             ],
                           ),
                         ),
-                      ),
-                    // Close button
-                    Positioned(
-                      top: Responsive.spacing(context, 10, 12, 14),
-                      left: Responsive.spacing(context, 10, 12, 14),
-                      child: ElevatedButton(
-                        onPressed: onClear,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(
-                            255,
-                            165,
-                            48,
-                            40,
-                          ).withValues(alpha: 200),
-                          padding: Responsive.padding(
-                            context,
-                            all: Responsive.spacing(context, 8, 10, 12),
-                          ),
-                        ),
-                        child: Icon(
-                          Icons.close,
-                          size: Responsive.iconSize(context, 18, 20, 22),
-                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                Positioned(
+                  top: Responsive.spacing(context, 8, 10, 12),
+                  right: Responsive.spacing(context, 8, 10, 12),
+                  child: ElevatedButton(
+                    onPressed: onClear,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(
+                        255,
+                        165,
+                        48,
+                        40,
+                      ).withValues(alpha: 200),
+                      padding: Responsive.padding(
+                        context,
+                        all: Responsive.spacing(context, 8, 10, 12),
                       ),
                     ),
-                  ],
+                    child: Icon(
+                      Icons.close,
+                      size: Responsive.iconSize(context, 18, 20, 22),
+                    ),
+                  ),
                 ),
-        ),
-      ),
+              ],
+            ),
     );
   }
 
@@ -466,3 +414,4 @@ class ImageEncoderLayout extends StatelessWidget {
     );
   }
 }
+

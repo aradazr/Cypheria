@@ -52,6 +52,19 @@ class AppLocalizations {
       'uploadImageToDecode': 'لطفا عکس مدنظر خود برای رمزگشایی را آپلود کنید',
       'saveToGallery': 'ذخیره در گالری',
       'savedToGallery': 'با موفقیت ذخیره شد',
+      'encryptedFileSelected': 'فایل رمزگذاری شده انتخاب شده است',
+      'decryptToView': 'برای نمایش تصویر، روی دکمه رمزگشایی کلیک کنید',
+      'encrypted': 'رمزگذاری شده',
+      'pleaseSelectImage': 'لطفاً یک تصویر انتخاب کنید',
+      'fileEncodingTab': 'رمزگذاری فایل',
+      'uploadFileToEncode': 'لطفا فایل مدنظر خود برای رمزنگاری را انتخاب کنید',
+      'uploadFileToDecode': 'لطفا فایل مدنظر خود برای رمزگشایی را انتخاب کنید',
+      'saveFile': 'ذخیره فایل',
+      'savedFile': 'فایل با موفقیت ذخیره شد',
+      'fileSelected': 'فایل انتخاب شده است',
+      'pleaseSelectFile': 'لطفاً یک فایل انتخاب کنید',
+      'saveEncryptedFileDialog': 'ذخیره فایل رمزگذاری شده',
+      'saveDecryptedFileDialog': 'ذخیره فایل رمزگشایی شده',
     },
     'en': {
       'appTitle': 'Cypheria',
@@ -91,6 +104,19 @@ class AppLocalizations {
       'uploadImageToDecode': 'Upload Your image to Decode',
       'saveToGallery': 'Save To Gallery',
       'savedToGallery': 'Successfully Saved',
+      'encryptedFileSelected': 'Encrypted file selected',
+      'decryptToView': 'Click the decode button to view the image',
+      'encrypted': 'Encrypted',
+      'pleaseSelectImage': 'Please select an image',
+      'fileEncodingTab': 'File Encoder',
+      'uploadFileToEncode': 'Select your file to encrypt',
+      'uploadFileToDecode': 'Select your file to decrypt',
+      'saveFile': 'Save File',
+      'savedFile': 'File saved successfully',
+      'fileSelected': 'File selected',
+      'pleaseSelectFile': 'Please select a file',
+      'saveEncryptedFileDialog': 'Save Encrypted File',
+      'saveDecryptedFileDialog': 'Save Decrypted File',
     },
   };
 
@@ -154,6 +180,32 @@ class AppLocalizations {
       _localizedValues[locale.languageCode]!['saveToGallery']!;
   String get savedToGallery =>
       _localizedValues[locale.languageCode]!['savedToGallery']!;
+  String get encryptedFileSelected =>
+      _localizedValues[locale.languageCode]!['encryptedFileSelected']!;
+  String get decryptToView =>
+      _localizedValues[locale.languageCode]!['decryptToView']!;
+  String get encrypted =>
+      _localizedValues[locale.languageCode]!['encrypted']!;
+  String get pleaseSelectImage =>
+      _localizedValues[locale.languageCode]!['pleaseSelectImage']!;
+  String get fileEncodingTab =>
+      _localizedValues[locale.languageCode]!['fileEncodingTab']!;
+  String get uploadFileToEncode =>
+      _localizedValues[locale.languageCode]!['uploadFileToEncode']!;
+  String get uploadFileToDecode =>
+      _localizedValues[locale.languageCode]!['uploadFileToDecode']!;
+  String get saveFile =>
+      _localizedValues[locale.languageCode]!['saveFile']!;
+  String get savedFile =>
+      _localizedValues[locale.languageCode]!['savedFile']!;
+  String get fileSelected =>
+      _localizedValues[locale.languageCode]!['fileSelected']!;
+  String get pleaseSelectFile =>
+      _localizedValues[locale.languageCode]!['pleaseSelectFile']!;
+  String get saveEncryptedFileDialog =>
+      _localizedValues[locale.languageCode]!['saveEncryptedFileDialog']!;
+  String get saveDecryptedFileDialog =>
+      _localizedValues[locale.languageCode]!['saveDecryptedFileDialog']!;
 }
 
 class _AppLocalizationsDelegate

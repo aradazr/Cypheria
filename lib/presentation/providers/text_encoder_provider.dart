@@ -3,6 +3,8 @@ import '../../domain/repositories/text_encoder_repository.dart';
 import '../../data/repositories/text_encoder_repository_impl.dart';
 import '../../core/localization/app_localizations.dart';
 
+enum TabType { text, image, file }
+
 class TextEncoderProvider extends ChangeNotifier {
   final TextEncoderRepository _repository = TextEncoderRepositoryImpl();
 
@@ -10,7 +12,7 @@ class TextEncoderProvider extends ChangeNotifier {
   String _key = '';
   String _outputText = '';
   bool _isEncoding = true;
-  bool _isEncodingImage = false;
+  TabType _currentTab = TabType.text;
 
   bool _isProcessing = false;
   String? _errorMessage;
@@ -19,7 +21,8 @@ class TextEncoderProvider extends ChangeNotifier {
   String get key => _key;
   String get outputText => _outputText;
   bool get isEncoding => _isEncoding;
-  bool get isEncodingImage => _isEncodingImage;
+  bool get isEncodingImage => _currentTab == TabType.image;
+  TabType get currentTab => _currentTab;
 
   bool get isProcessing => _isProcessing;
   String? get errorMessage => _errorMessage;
@@ -46,8 +49,26 @@ class TextEncoderProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setTab(TabType tab) {
+    if (_currentTab != tab) {
+      _currentTab = tab;
+      notifyListeners();
+    }
+  }
+
   void toggleTab() {
-    _isEncodingImage = !_isEncodingImage;
+    // Cycle through tabs: text -> image -> file -> text
+    switch (_currentTab) {
+      case TabType.text:
+        _currentTab = TabType.image;
+        break;
+      case TabType.image:
+        _currentTab = TabType.file;
+        break;
+      case TabType.file:
+        _currentTab = TabType.text;
+        break;
+    }
     notifyListeners();
   }
 

@@ -6,6 +6,7 @@ import '../../core/utils/responsive.dart';
 import '../providers/text_encoder_provider.dart';
 import '../screens/text_encoder_layout.dart';
 import '../screens/image_encoder_layout.dart';
+import '../screens/file_encoder_layout.dart';
 
 import '../widgets/tab_switch_button.dart';
 import '../widgets/settings_bar.dart';
@@ -27,7 +28,15 @@ class HomeScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(height: Responsive.spacing(context, 20, 22, 24)),
+            // Tab Switch Button right below AppBar
+            Consumer<TextEncoderProvider>(
+              builder: (context, provider, child) {
+                return TabSwitchButton(
+                  currentTab: provider.currentTab,
+                  onTabChanged: (tab) => provider.setTab(tab),
+                );
+              },
+            ),
 
             Expanded(
               child: Consumer<TextEncoderProvider>(
@@ -45,24 +54,17 @@ class HomeScreen extends StatelessWidget {
                               MediaQuery.of(context).size.height -
                               MediaQuery.of(context).padding.top -
                               AppBar().preferredSize.height -
-                              Responsive.spacing(context, 60, 80, 100),
+                              Responsive.spacing(context, 100, 120, 140),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Center(
-                              child: TabSwitchButton(
-                                usingImageEncoder: provider.isEncodingImage,
-                                onToggle: provider.toggleTab,
-                              ),
-                            ),
-                            SizedBox(
-                              height: Responsive.spacing(context, 24, 32, 40),
-                            ),
-
-                            !provider.isEncodingImage
-                                ? TextEncoderLayout()
-                                : ImageEncoderLayout(),
+                            if (provider.currentTab == TabType.text)
+                              TextEncoderLayout()
+                            else if (provider.currentTab == TabType.image)
+                              ImageEncoderLayout()
+                            else if (provider.currentTab == TabType.file)
+                              FileEncoderLayout(),
                           ],
                         ),
                       ),
