@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -17,6 +18,7 @@ class FileEncoderProvider extends ChangeNotifier {
   bool isLoadingDecode = false;
   String? _errorMessage;
   String? selectedFileName;
+  String? originalFileName; // Keep original file name for display
 
   bool get isEncoding => _isEncoding;
   String? get errorMessage => _errorMessage;
@@ -24,6 +26,22 @@ class FileEncoderProvider extends ChangeNotifier {
   void toggleMode() {
     _isEncoding = !_isEncoding;
     _errorMessage = null;
+    // Clear files when switching modes to prevent confusion
+    if (_isEncoding) {
+      // Switching to encoding mode - clear decode files
+      selectedFileToDecode = null;
+      originalFileToDecode = null;
+      isDecoded = false;
+      selectedFileName = null;
+      originalFileName = null;
+    } else {
+      // Switching to decoding mode - clear encode files
+      selectedFileToEncode = null;
+      originalFileToEncode = null;
+      isEncoded = false;
+      selectedFileName = null;
+      originalFileName = null;
+    }
     notifyListeners();
   }
 
@@ -38,6 +56,7 @@ class FileEncoderProvider extends ChangeNotifier {
         selectedFileToEncode = file;
         originalFileToEncode = file; // Keep original for re-encoding
         selectedFileName = result.files.single.name;
+        originalFileName = result.files.single.name; // Keep original file name
         isEncoded = false;
         notifyListeners();
       }
@@ -58,6 +77,10 @@ class FileEncoderProvider extends ChangeNotifier {
         selectedFileToDecode = file;
         originalFileToDecode = file; // Keep encrypted file for re-decoding
         selectedFileName = result.files.single.name;
+        originalFileName = result.files.single.name.replaceAll(
+          '.encrypted',
+          '',
+        ); // Keep original file name without .encrypted
         isDecoded = false;
         notifyListeners();
       }
@@ -71,6 +94,7 @@ class FileEncoderProvider extends ChangeNotifier {
     selectedFileToEncode = null;
     originalFileToEncode = null;
     selectedFileName = null;
+    originalFileName = null;
     isEncoded = false;
     _errorMessage = null;
     keyController.clear();
@@ -81,6 +105,7 @@ class FileEncoderProvider extends ChangeNotifier {
     selectedFileToDecode = null;
     originalFileToDecode = null;
     selectedFileName = null;
+    originalFileName = null;
     isDecoded = false;
     _errorMessage = null;
     keyController.clear();
@@ -109,11 +134,16 @@ class FileEncoderProvider extends ChangeNotifier {
       }
 
       // Store original file before encoding (if not already stored)
-      if (originalFileToEncode == null || originalFileToEncode!.path != file.path) {
+      if (originalFileToEncode == null ||
+          originalFileToEncode!.path != file.path) {
         originalFileToEncode = file;
       }
 
-      final encoded = await FileService.encodeFile(file, key, fileName: selectedFileName);
+      final encoded = await FileService.encodeFile(
+        file,
+        key,
+        fileName: selectedFileName,
+      );
       selectedFileToEncode = encoded; // This is the encrypted file
       // originalFileToEncode stays the same (original file for re-encoding)
       isEncoded = true;
@@ -149,11 +179,16 @@ class FileEncoderProvider extends ChangeNotifier {
       }
 
       // Store encrypted file before decoding (if not already stored)
-      if (originalFileToDecode == null || originalFileToDecode!.path != file.path) {
+      if (originalFileToDecode == null ||
+          originalFileToDecode!.path != file.path) {
         originalFileToDecode = file;
       }
 
-      final decoded = await FileService.decodeFile(file, key, fileName: selectedFileName);
+      final decoded = await FileService.decodeFile(
+        file,
+        key,
+        fileName: selectedFileName,
+      );
       selectedFileToDecode = decoded; // This is the decrypted file
       // originalFileToDecode stays the same (encrypted file for re-decoding)
       isDecoded = true;
@@ -175,37 +210,70 @@ class FileEncoderProvider extends ChangeNotifier {
     }
 
     try {
+      // Read base64 string from file and convert to UTF-8 bytes
+      final base64String = await selectedFileToEncode!.readAsString();
+      final bytes = utf8.encode(base64String);
+
       // Use file_picker to save the file
+      // Preserve original extension and add .encrypted
+      String fileNameToSave = 'encrypted_file.encrypted';
+      if (selectedFileName != null) {
+        final originalName = selectedFileName!;
+        final baseName = originalName.replaceAll(RegExp(r'\.[^.]*$'), '');
+        final extension = originalName.contains('.')
+            ? originalName.substring(originalName.lastIndexOf('.'))
+            : '';
+        fileNameToSave = '${baseName}_encrypted$extension.encrypted';
+      }
+
       final result = await FilePicker.platform.saveFile(
         dialogTitle: dialogTitle,
-        fileName: selectedFileName != null 
-            ? '${selectedFileName!.replaceAll(RegExp(r'\.[^.]*$'), '')}_encrypted.encrypted'
-            : 'encrypted_file.encrypted',
-        bytes: await selectedFileToEncode!.readAsBytes(),
+        fileName: fileNameToSave,
+        bytes: bytes,
       );
 
       if (result != null) {
         _errorMessage = null;
       }
     } catch (e) {
-      _errorMessage = 'خطا در ذخیره فایل: ${e.toString().replaceAll('Exception: ', '')}';
+      _errorMessage =
+          'خطا در ذخیره فایل: ${e.toString().replaceAll('Exception: ', '')}';
       notifyListeners();
     }
   }
 
   Future<void> saveDecodedFile(String dialogTitle) async {
-    if (selectedFileToDecode == null) {
+    if (selectedFileToDecode == null || !isDecoded) {
       _errorMessage = 'هیچ فایل رمزگشایی شده‌ای برای ذخیره وجود ندارد';
+      notifyListeners();
+      return;
+    }
+
+    // Ensure we're using the decoded file, not the encrypted one
+    if (selectedFileToDecode!.path == originalFileToDecode?.path) {
+      _errorMessage = 'خطا: فایل رمزگشایی نشده است';
       notifyListeners();
       return;
     }
 
     try {
       // Use file_picker to save the file
-      final originalName = selectedFileName?.replaceAll('.encrypted', '') ?? 'decrypted_file';
+      // Get the decoded file name (which has the correct extension)
+      String decodedFileName = selectedFileToDecode!.path.split('/').last;
+
+      // Remove timestamp pattern if exists: _timestamp_randomnumber
+      // Keep the extension (e.g., S_1234567890_12345.rar -> S.rar)
+      String fileNameToSave = decodedFileName;
+      final pattern = RegExp(r'_\d+_\d+(\.\w+)$');
+      if (pattern.hasMatch(decodedFileName)) {
+        final match = pattern.firstMatch(decodedFileName);
+        final extension = match?.group(1) ?? '';
+        fileNameToSave = decodedFileName.replaceFirst(pattern, extension);
+      }
+
       final result = await FilePicker.platform.saveFile(
         dialogTitle: dialogTitle,
-        fileName: originalName,
+        fileName: fileNameToSave,
         bytes: await selectedFileToDecode!.readAsBytes(),
       );
 
@@ -213,7 +281,8 @@ class FileEncoderProvider extends ChangeNotifier {
         _errorMessage = null;
       }
     } catch (e) {
-      _errorMessage = 'خطا در ذخیره فایل: ${e.toString().replaceAll('Exception: ', '')}';
+      _errorMessage =
+          'خطا در ذخیره فایل: ${e.toString().replaceAll('Exception: ', '')}';
       notifyListeners();
     }
   }

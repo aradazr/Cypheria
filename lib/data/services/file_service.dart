@@ -76,17 +76,25 @@ class FileService {
       );
       final encrypted = encrypter.encryptBytes(fileBytes, iv: vector);
 
-      // Save encrypted bytes to file
+      // Convert encrypted bytes to base64 (same approach as text encryption)
+      final base64Encoded = encrypted.base64;
+
+      // Save base64 encoded string to file
       final dir = await getTemporaryDirectory();
       final random = Random();
       final originalName = fileName ?? inputFile.path.split('/').last;
-      String randomName = originalName;
+      // Extract base name and extension
+      final baseName = originalName.replaceAll(RegExp(r'\.[^.]*$'), '');
+      final extension = originalName.contains('.')
+          ? originalName.substring(originalName.lastIndexOf('.'))
+          : '';
+      String randomName = baseName;
       randomName += "_${DateTime.now().millisecondsSinceEpoch}";
       randomName += "_${random.nextInt(100000)}";
-      randomName += ".encrypted";
+      randomName += "$extension.encrypted";
 
       final file = File('${dir.path}/$randomName');
-      await file.writeAsBytes(Uint8List.fromList(encrypted.bytes), flush: true);
+      await file.writeAsString(base64Encoded, flush: true);
 
       return file;
     } on Exception {
@@ -107,11 +115,28 @@ class FileService {
     await _validateFile(encodedFile);
 
     try {
-      // Read encrypted bytes
-      final encryptedBytes = await encodedFile.readAsBytes();
-      if (encryptedBytes.isEmpty) {
+      // Read bytes from file (FilePicker saves as binary)
+      final fileBytes = await encodedFile.readAsBytes();
+      if (fileBytes.isEmpty) {
         throw Exception('فایل رمزگذاری شده خالی است');
       }
+
+      // Convert bytes to UTF-8 string (base64 encoded)
+      final base64String = utf8.decode(fileBytes);
+      if (base64String.trim().isEmpty) {
+        throw Exception('فایل رمزگذاری شده خالی است');
+      }
+
+      // Clean the base64 string (remove whitespace)
+      final cleanedBase64 = base64String.trim().replaceAll(RegExp(r'\s+'), '');
+
+      // Validate Base64 format
+      if (cleanedBase64.isEmpty) {
+        throw Exception('فایل رمزگذاری شده خالی است');
+      }
+
+      // Convert base64 to Encrypted object (same approach as text decryption)
+      final encrypted = enc.Encrypted.fromBase64(cleanedBase64);
 
       // Decrypt bytes using AES-256-CBC (same as text encryption)
       final keyMaterial = _prepareKeyMaterial(key);
@@ -120,30 +145,71 @@ class FileService {
         enc.AES(keyMaterial, mode: enc.AESMode.cbc),
       );
 
-      final encrypted = enc.Encrypted(encryptedBytes);
       final decryptedBytesList = encrypter.decryptBytes(encrypted, iv: vector);
       final decryptedBytes = Uint8List.fromList(decryptedBytesList);
 
       // Save decrypted file
       final dir = await getTemporaryDirectory();
       final random = Random();
-      final originalName = fileName ?? encodedFile.path.split('/').last.replaceAll('.encrypted', '');
-      String randomName = originalName;
+      String originalName = fileName ?? encodedFile.path.split('/').last;
+      String baseName = '';
+      String extension = '';
+
+      // Remove .encrypted extension
+      if (originalName.endsWith('.encrypted')) {
+        originalName = originalName.substring(
+          0,
+          originalName.length - 10,
+        ); // Remove '.encrypted'
+      }
+
+      // Extract extension (before .encrypted we have the original extension)
+      // Format can be: name_encrypted.ext or name_timestamp_random.ext
+      final lastDot = originalName.lastIndexOf('.');
+      if (lastDot > 0) {
+        extension = originalName.substring(lastDot); // e.g., .jpeg
+        baseName = originalName.substring(
+          0,
+          lastDot,
+        ); // e.g., images_encrypted or images_1234567890_12345
+      } else {
+        baseName = originalName;
+      }
+
+      // Remove _encrypted suffix if present (from FilePicker saved files)
+      if (baseName.endsWith('_encrypted')) {
+        baseName = baseName.substring(0, baseName.length - 10);
+      }
+      // Remove timestamp pattern if present (from temp directory files)
+      else {
+        final timestampPattern = RegExp(r'_\d+_\d+$');
+        if (timestampPattern.hasMatch(baseName)) {
+          baseName = baseName.replaceFirst(timestampPattern, '');
+        }
+      }
+
+      // Use original name with extension (add timestamp to avoid conflicts)
+      String randomName = baseName;
       randomName += "_${DateTime.now().millisecondsSinceEpoch}";
       randomName += "_${random.nextInt(100000)}";
+      randomName += extension; // Add extension at the end
 
       final file = File('${dir.path}/$randomName');
       await file.writeAsBytes(decryptedBytes, flush: true);
 
       return file;
     } on ArgumentError {
-      throw Exception('کلید رمزگذاری اشتباه است یا فایل رمزگذاری شده با این کلید رمزگذاری نشده است.');
+      throw Exception(
+        'کلید رمزگذاری اشتباه است یا فایل رمزگذاری شده با این کلید رمزگذاری نشده است.',
+      );
     } on Exception {
       rethrow;
     } catch (e) {
       final errorMsg = e.toString().toLowerCase();
       if (errorMsg.contains('invalid') || errorMsg.contains('argument')) {
-        throw Exception('کلید رمزگذاری اشتباه است یا فایل رمزگذاری شده با این کلید رمزگذاری نشده است.');
+        throw Exception(
+          'کلید رمزگذاری اشتباه است یا فایل رمزگذاری شده با این کلید رمزگذاری نشده است.',
+        );
       }
       throw Exception('خطا در رمزگشایی فایل: $e');
     }
@@ -158,4 +224,3 @@ Future<File> encodeFile(File inputFile, String key, {String? fileName}) {
 Future<File> decodeFile(File encodedFile, String key, {String? fileName}) {
   return FileService.decodeFile(encodedFile, key, fileName: fileName);
 }
-

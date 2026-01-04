@@ -83,7 +83,9 @@ class FileEncoderLayout extends StatelessWidget {
 
             _filePicker(
               context: context,
-              fileName: provider.selectedFileName,
+              fileName: isEncoding && provider.isEncoded
+                  ? provider.originalFileName
+                  : provider.selectedFileName,
               hintText: isEncoding
                   ? localizations.uploadFileToEncode
                   : localizations.uploadFileToDecode,
@@ -107,12 +109,14 @@ class FileEncoderLayout extends StatelessWidget {
                   : localizations.decoding,
               onPressed: isLoading
                   ? null
-                  : () {
+                  : () async {
                       if (isEncoding) {
-                        final fileToEncode = provider.isEncoded && provider.originalFileToEncode != null
+                        final fileToEncode =
+                            provider.isEncoded &&
+                                provider.originalFileToEncode != null
                             ? provider.originalFileToEncode!
                             : provider.selectedFileToEncode;
-                        
+
                         if (fileToEncode == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -123,15 +127,25 @@ class FileEncoderLayout extends StatelessWidget {
                           return;
                         }
 
-                        provider.encodeFile(
+                        await provider.encodeFile(
                           fileToEncode,
                           provider.keyController.text,
                         );
+
+                        // Show error message if encode failed
+                        if (provider.errorMessage != null && context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(provider.errorMessage!),
+                              duration: const Duration(seconds: 3),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       } else {
-                        final fileToDecode = provider.isDecoded && provider.originalFileToDecode != null
-                            ? provider.originalFileToDecode!
-                            : provider.selectedFileToDecode;
-                        
+                        // For decoding, always use originalFileToDecode (the encrypted file picked by user)
+                        final fileToDecode = provider.originalFileToDecode;
+
                         if (fileToDecode == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -142,10 +156,21 @@ class FileEncoderLayout extends StatelessWidget {
                           return;
                         }
 
-                        provider.decodeFile(
+                        await provider.decodeFile(
                           fileToDecode,
                           provider.keyController.text,
                         );
+
+                        // Show error message if decode failed
+                        if (provider.errorMessage != null && context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(provider.errorMessage!),
+                              duration: const Duration(seconds: 3),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       }
                     },
             ),
@@ -158,12 +183,25 @@ class FileEncoderLayout extends StatelessWidget {
                 text: localizations.saveFile,
                 onPressed: () async {
                   if (isEncoding) {
-                    await provider.saveEncodedFile(localizations.saveEncryptedFileDialog);
+                    await provider.saveEncodedFile(
+                      localizations.saveEncryptedFileDialog,
+                    );
                   } else {
-                    await provider.saveDecodedFile(localizations.saveDecryptedFileDialog);
+                    await provider.saveDecodedFile(
+                      localizations.saveDecryptedFileDialog,
+                    );
                   }
 
-                  if (provider.errorMessage == null && context.mounted) {
+                  // Show error message if save failed
+                  if (provider.errorMessage != null && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(provider.errorMessage!),
+                        duration: const Duration(seconds: 3),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  } else if (provider.errorMessage == null && context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(localizations.savedFile),
@@ -192,11 +230,13 @@ class FileEncoderLayout extends StatelessWidget {
     bool isEncoded = false,
   }) {
     final localizations = AppLocalizations.of(context)!;
-    
+
     return Container(
       height: Responsive.height(context, 200),
       decoration: BoxDecoration(
-        color: fileName == null ? const Color(0xFF1E1E2E) : Theme.of(context).cardColor,
+        color: fileName == null
+            ? const Color(0xFF1E1E2E)
+            : Theme.of(context).cardColor,
         border: Border.all(
           color: Theme.of(context).brightness == Brightness.dark
               ? Colors.grey.shade800
@@ -250,14 +290,22 @@ class FileEncoderLayout extends StatelessWidget {
                             size: Responsive.iconSize(context, 32, 36, 40),
                             color: Theme.of(context).colorScheme.primary,
                           ),
-                          SizedBox(width: Responsive.spacing(context, 12, 14, 16)),
+                          SizedBox(
+                            width: Responsive.spacing(context, 12, 14, 16),
+                          ),
                           Expanded(
                             child: Text(
                               fileName,
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                fontSize: Responsive.fontSize(context, 14, 16, 18),
-                                fontFamily: 'PelakFA',
-                              ),
+                              style: Theme.of(context).textTheme.bodyLarge
+                                  ?.copyWith(
+                                    fontSize: Responsive.fontSize(
+                                      context,
+                                      14,
+                                      16,
+                                      18,
+                                    ),
+                                    fontFamily: 'PelakFA',
+                                  ),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
                             ),
@@ -265,14 +313,18 @@ class FileEncoderLayout extends StatelessWidget {
                         ],
                       ),
                       if (isEncoded) ...[
-                        SizedBox(height: Responsive.spacing(context, 8, 10, 12)),
+                        SizedBox(
+                          height: Responsive.spacing(context, 8, 10, 12),
+                        ),
                         Container(
                           padding: EdgeInsets.symmetric(
                             horizontal: Responsive.spacing(context, 12, 14, 16),
                             vertical: Responsive.spacing(context, 6, 8, 10),
                           ),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(
                               Responsive.borderRadius(context, 20, 24, 28),
                             ),
@@ -285,12 +337,19 @@ class FileEncoderLayout extends StatelessWidget {
                                 size: Responsive.iconSize(context, 16, 18, 20),
                                 color: Theme.of(context).colorScheme.primary,
                               ),
-                              SizedBox(width: Responsive.spacing(context, 4, 5, 6)),
+                              SizedBox(
+                                width: Responsive.spacing(context, 4, 5, 6),
+                              ),
                               Text(
                                 localizations.encrypted,
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.primary,
-                                  fontSize: Responsive.fontSize(context, 12, 14, 16),
+                                  fontSize: Responsive.fontSize(
+                                    context,
+                                    12,
+                                    14,
+                                    16,
+                                  ),
                                   fontWeight: FontWeight.w600,
                                   fontFamily: 'PelakFA',
                                 ),
@@ -386,10 +445,7 @@ class FileEncoderLayout extends StatelessWidget {
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: onPressed,
-        icon: Icon(
-          Icons.save,
-          size: Responsive.iconSize(context, 20, 22, 24),
-        ),
+        icon: Icon(Icons.save, size: Responsive.iconSize(context, 20, 22, 24)),
         label: Text(
           text,
           style: TextStyle(
@@ -414,4 +470,3 @@ class FileEncoderLayout extends StatelessWidget {
     );
   }
 }
-
