@@ -73,5 +73,5 @@ Future<File> decodeFile(
 }
 
 Future<void> saveToGallery(File imageFile) async {
-  await GallerySaver.saveImage(imageFile.path, albumName: "Encodit");
+  await GallerySaver.saveImage(imageFile.path, albumName: "Cyoheria");
 }
