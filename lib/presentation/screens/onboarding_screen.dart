@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/utils/responsive.dart';
 import '../providers/onboarding_provider.dart';
+import '../providers/language_provider.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -15,16 +16,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<OnboardingStep> _steps = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeSteps();
-  }
-
-  void _initializeSteps() {
-    // Steps will be initialized in build method with localizations
+  List<OnboardingStep> _getSteps(AppLocalizations localizations) {
+    return [
+      OnboardingStep(
+        icon: Icons.lock,
+        title: localizations.onboardingTitle1,
+        description: localizations.onboardingDescription1,
+        color: const Color(0xFF6366F1),
+      ),
+      OnboardingStep(
+        icon: Icons.vpn_key,
+        title: localizations.onboardingTitle2,
+        description: localizations.onboardingDescription2,
+        color: const Color(0xFF8B5CF6),
+      ),
+      OnboardingStep(
+        icon: Icons.swap_horiz,
+        title: localizations.onboardingTitle3,
+        description: localizations.onboardingDescription3,
+        color: const Color(0xFF6366F1),
+      ),
+      OnboardingStep(
+        icon: Icons.check_circle,
+        title: localizations.onboardingTitle4,
+        description: localizations.onboardingDescription4,
+        color: const Color(0xFF10B981),
+      ),
+    ];
   }
 
   @override
@@ -34,11 +52,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextPage() {
-    if (_currentPage < _steps.length - 1) {
+    final localizations = AppLocalizations.of(context)!;
+    final steps = _getSteps(localizations);
+    if (_currentPage < steps.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-      );
+      ).then((_) {
+        setState(() {
+          // Page changed
+        });
+      });
     } else {
       _completeOnboarding();
     }
@@ -56,125 +80,113 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final isRTL = Localizations.localeOf(context).languageCode == 'fa';
+    final steps = _getSteps(localizations);
 
-    // Initialize steps with localizations
-    if (_steps.isEmpty) {
-      _steps.addAll([
-        OnboardingStep(
-          icon: Icons.lock,
-          title: localizations.onboardingTitle1,
-          description: localizations.onboardingDescription1,
-          color: const Color(0xFF6366F1),
-        ),
-        OnboardingStep(
-          icon: Icons.vpn_key,
-          title: localizations.onboardingTitle2,
-          description: localizations.onboardingDescription2,
-          color: const Color(0xFF8B5CF6),
-        ),
-        OnboardingStep(
-          icon: Icons.swap_horiz,
-          title: localizations.onboardingTitle3,
-          description: localizations.onboardingDescription3,
-          color: const Color(0xFF6366F1),
-        ),
-        OnboardingStep(
-          icon: Icons.check_circle,
-          title: localizations.onboardingTitle4,
-          description: localizations.onboardingDescription4,
-          color: const Color(0xFF10B981),
-        ),
-      ]);
-    }
-
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Skip button
-            Align(
-              alignment: isRTL ? Alignment.topRight : Alignment.topLeft,
-              child: Padding(
+    return Directionality(
+      textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Skip button and Language Toggle
+              Padding(
                 padding: Responsive.padding(context, all: 16),
-                child: TextButton(
-                  onPressed: _skipOnboarding,
-                  child: Text(
-                    localizations.skip,
-                    style: TextStyle(
-                      fontSize: Responsive.fontSize(context, 14, 16, 18),
-                      fontFamily: 'PelakFA',
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: _skipOnboarding,
+                      child: Text(
+                        localizations.skip,
+                        style: TextStyle(
+                          fontSize: Responsive.fontSize(context, 14, 16, 18),
+                          fontFamily: 'PelakFA',
+                        ),
+                      ),
+                    ),
+                    Consumer<LanguageProvider>(
+                      builder: (context, languageProvider, child) {
+                        return IconButton(
+                          onPressed: languageProvider.toggleLanguage,
+                          icon: const Icon(Icons.language),
+                          tooltip: languageProvider.isPersian
+                              ? 'Switch to English'
+                              : 'تغییر به فارسی',
+                          iconSize: Responsive.iconSize(context, 22, 24, 26),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // Page view
+              Expanded(
+                child: PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentPage = index;
+                    });
+                  },
+                  itemCount: steps.length,
+                  itemBuilder: (context, index) {
+                    return _buildPage(steps[index], context, isRTL);
+                  },
+                ),
+              ),
+
+              // Page indicator
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  steps.length,
+                  (index) => _buildIndicator(index == _currentPage, context),
+                ),
+              ),
+
+              SizedBox(height: Responsive.spacing(context, 20, 24, 28)),
+
+              // Next/Get Started button
+              Padding(
+                padding: Responsive.padding(
+                  context,
+                  horizontal: Responsive.width(context, 24, 32, 40),
+                  vertical: Responsive.height(context, 16, 20, 24),
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _nextPage,
+                    style: ElevatedButton.styleFrom(
+                      padding: Responsive.padding(
+                        context,
+                        vertical: Responsive.height(context, 14, 16, 18),
+                      ),
+                    ),
+                    child: Text(
+                      _currentPage == steps.length - 1
+                          ? localizations.getStarted
+                          : localizations.next,
+                      style: TextStyle(
+                        fontSize: Responsive.fontSize(context, 16, 18, 20),
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'PelakFA',
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
 
-            // Page view
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentPage = index;
-                  });
-                },
-                itemCount: _steps.length,
-                itemBuilder: (context, index) {
-                  return _buildPage(_steps[index], context);
-                },
-              ),
-            ),
-
-            // Page indicator
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                _steps.length,
-                (index) => _buildIndicator(index == _currentPage, context),
-              ),
-            ),
-
-            SizedBox(height: Responsive.spacing(context, 20, 24, 28)),
-
-            // Next/Get Started button
-            Padding(
-              padding: Responsive.padding(
-                context,
-                horizontal: Responsive.width(context, 24, 32, 40),
-                vertical: Responsive.height(context, 16, 20, 24),
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _nextPage,
-                  style: ElevatedButton.styleFrom(
-                    padding: Responsive.padding(
-                      context,
-                      vertical: Responsive.height(context, 14, 16, 18),
-                    ),
-                  ),
-                  child: Text(
-                    _currentPage == _steps.length - 1
-                        ? localizations.getStarted
-                        : localizations.next,
-                    style: TextStyle(
-                      fontSize: Responsive.fontSize(context, 16, 18, 20),
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'PelakFA',
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            SizedBox(height: Responsive.spacing(context, 20, 24, 28)),
-          ],
+              SizedBox(height: Responsive.spacing(context, 20, 24, 28)),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildPage(OnboardingStep step, BuildContext context) {
+  Widget _buildPage(OnboardingStep step, BuildContext context, bool isRTL) {
     return Padding(
       padding: Responsive.padding(
         context,
@@ -205,6 +217,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             step.title,
             textAlign: TextAlign.center,
+            textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
             style: TextStyle(
               fontSize: Responsive.fontSize(context, 24, 28, 32),
               fontWeight: FontWeight.bold,
@@ -219,6 +232,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             step.description,
             textAlign: TextAlign.center,
+            textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
             style: TextStyle(
               fontSize: Responsive.fontSize(context, 16, 18, 20),
               fontFamily: 'PelakFA',
@@ -263,4 +277,3 @@ class OnboardingStep {
     required this.color,
   });
 }
-

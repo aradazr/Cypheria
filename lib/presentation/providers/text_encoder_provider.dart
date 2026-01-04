@@ -3,6 +3,8 @@ import '../../domain/repositories/text_encoder_repository.dart';
 import '../../data/repositories/text_encoder_repository_impl.dart';
 import '../../core/localization/app_localizations.dart';
 
+enum TabType { text, image, file }
+
 class TextEncoderProvider extends ChangeNotifier {
   final TextEncoderRepository _repository = TextEncoderRepositoryImpl();
 
@@ -10,6 +12,8 @@ class TextEncoderProvider extends ChangeNotifier {
   String _key = '';
   String _outputText = '';
   bool _isEncoding = true;
+  TabType _currentTab = TabType.text;
+
   bool _isProcessing = false;
   String? _errorMessage;
 
@@ -17,6 +21,9 @@ class TextEncoderProvider extends ChangeNotifier {
   String get key => _key;
   String get outputText => _outputText;
   bool get isEncoding => _isEncoding;
+  bool get isEncodingImage => _currentTab == TabType.image;
+  TabType get currentTab => _currentTab;
+
   bool get isProcessing => _isProcessing;
   String? get errorMessage => _errorMessage;
 
@@ -42,6 +49,29 @@ class TextEncoderProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setTab(TabType tab) {
+    if (_currentTab != tab) {
+      _currentTab = tab;
+      notifyListeners();
+    }
+  }
+
+  void toggleTab() {
+    // Cycle through tabs: text -> image -> file -> text
+    switch (_currentTab) {
+      case TabType.text:
+        _currentTab = TabType.image;
+        break;
+      case TabType.image:
+        _currentTab = TabType.file;
+        break;
+      case TabType.file:
+        _currentTab = TabType.text;
+        break;
+    }
+    notifyListeners();
+  }
+
   Future<void> process(BuildContext? context) async {
     if (_inputText.isEmpty) {
       _errorMessage = context != null
@@ -64,7 +94,9 @@ class TextEncoderProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(milliseconds: 100)); // Small delay for UX
+      await Future.delayed(
+        const Duration(milliseconds: 100),
+      ); // Small delay for UX
 
       if (_isEncoding) {
         _outputText = _repository.encode(_inputText, _key);
@@ -79,7 +111,7 @@ class TextEncoderProvider extends ChangeNotifier {
       if (errorMsg.startsWith('Exception: ')) {
         errorMsg = errorMsg.substring(11); // Remove 'Exception: ' prefix
       }
-      
+
       _errorMessage = errorMsg;
       _outputText = '';
     } finally {
@@ -117,4 +149,3 @@ class TextEncoderProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
-

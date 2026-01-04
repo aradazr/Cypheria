@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:text_encoder/presentation/providers/image_encoder_provider.dart';
+import 'package:text_encoder/presentation/providers/file_encoder_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/localization/app_localizations.dart';
 import 'presentation/providers/text_encoder_provider.dart';
@@ -21,6 +23,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => TextEncoderProvider()),
+        ChangeNotifierProvider(create: (_) => ImageEncoderProvider()),
+        ChangeNotifierProvider(create: (_) => FileEncoderProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => OnboardingProvider()),

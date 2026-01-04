@@ -14,7 +14,9 @@ class AppLocalizations {
 
   static final Map<String, Map<String, String>> _localizedValues = {
     'fa': {
-      'appTitle': 'رمزگذار متن',
+      'appTitle': 'سایفریا',
+      'imageEncodingTab': 'رمزگذاری عکس',
+      'textEncodingTab': 'رمزگذاری متن',
       'encoding': 'رمزگذاری',
       'decoding': 'رمزگشایی',
       'encryptionKey': 'کلید رمزگذاری',
@@ -35,16 +37,39 @@ class AppLocalizations {
       'next': 'بعدی',
       'getStarted': 'شروع کنید',
       'onboardingTitle1': 'به Cypheria خوش آمدید',
-      'onboardingDescription1': 'یک اپلیکیشن امن و مدرن برای رمزگذاری و رمزگشایی متن‌های شما',
+      'onboardingDescription1':
+          'یک اپلیکیشن امن و مدرن برای رمزگذاری و رمزگشایی متن‌های شما',
       'onboardingTitle2': 'رمزگذاری با کلید اختصاصی',
-      'onboardingDescription2': 'کلید خود را انتخاب کنید و متن‌هایتان را با امنیت بالا رمزگذاری کنید',
+      'onboardingDescription2':
+          'کلید خود را انتخاب کنید و متن‌هایتان را با امنیت بالا رمزگذاری کنید',
       'onboardingTitle3': 'تبدیل آسان',
-      'onboardingDescription3': 'به راحتی بین حالت رمزگذاری و رمزگشایی جابجا شوید',
+      'onboardingDescription3':
+          'به راحتی بین حالت رمزگذاری و رمزگشایی جابجا شوید',
       'onboardingTitle4': 'آماده استفاده',
-      'onboardingDescription4': 'حالا می‌توانید از تمام قابلیت‌های Cypheria استفاده کنید',
+      'onboardingDescription4':
+          'حالا می‌توانید از تمام قابلیت‌های Cypheria استفاده کنید',
+      'uploadImageToEncode': 'لطفا عکس مدنظر خود برای رمزنگاری را آپلود کنید',
+      'uploadImageToDecode': 'لطفا عکس مدنظر خود برای رمزگشایی را آپلود کنید',
+      'saveToGallery': 'ذخیره در گالری',
+      'savedToGallery': 'با موفقیت ذخیره شد',
+      'encryptedFileSelected': 'فایل رمزگذاری شده انتخاب شده است',
+      'decryptToView': 'برای نمایش تصویر، روی دکمه رمزگشایی کلیک کنید',
+      'encrypted': 'رمزگذاری شده',
+      'pleaseSelectImage': 'لطفاً یک تصویر انتخاب کنید',
+      'fileEncodingTab': 'رمزگذاری فایل',
+      'uploadFileToEncode': 'لطفا فایل مدنظر خود برای رمزنگاری را انتخاب کنید',
+      'uploadFileToDecode': 'لطفا فایل مدنظر خود برای رمزگشایی را انتخاب کنید',
+      'saveFile': 'ذخیره فایل',
+      'savedFile': 'فایل با موفقیت ذخیره شد',
+      'fileSelected': 'فایل انتخاب شده است',
+      'pleaseSelectFile': 'لطفاً یک فایل انتخاب کنید',
+      'saveEncryptedFileDialog': 'ذخیره فایل رمزگذاری شده',
+      'saveDecryptedFileDialog': 'ذخیره فایل رمزگشایی شده',
     },
     'en': {
-      'appTitle': 'Text Encoder',
+      'appTitle': 'Cypheria',
+      'imageEncodingTab': 'Image Encoder',
+      'textEncodingTab': 'Text Encoder',
       'encoding': 'Encode',
       'decoding': 'Decode',
       'encryptionKey': 'Encryption Key',
@@ -65,17 +90,42 @@ class AppLocalizations {
       'next': 'Next',
       'getStarted': 'Get Started',
       'onboardingTitle1': 'Welcome to Cypheria',
-      'onboardingDescription1': 'A secure and modern app for encrypting and decrypting your texts',
+      'onboardingDescription1':
+          'A secure and modern app for encrypting and decrypting your texts',
       'onboardingTitle2': 'Encryption with Custom Key',
-      'onboardingDescription2': 'Choose your key and encrypt your texts with high security',
+      'onboardingDescription2':
+          'Choose your key and encrypt your texts with high security',
       'onboardingTitle3': 'Easy Switching',
-      'onboardingDescription3': 'Easily switch between encoding and decoding modes',
+      'onboardingDescription3':
+          'Easily switch between encoding and decoding modes',
       'onboardingTitle4': 'Ready to Use',
       'onboardingDescription4': 'Now you can use all Cypheria features',
+      'uploadImageToEncode': 'Upload Your image to Encode',
+      'uploadImageToDecode': 'Upload Your image to Decode',
+      'saveToGallery': 'Save To Gallery',
+      'savedToGallery': 'Successfully Saved',
+      'encryptedFileSelected': 'Encrypted file selected',
+      'decryptToView': 'Click the decode button to view the image',
+      'encrypted': 'Encrypted',
+      'pleaseSelectImage': 'Please select an image',
+      'fileEncodingTab': 'File Encoder',
+      'uploadFileToEncode': 'Select your file to encrypt',
+      'uploadFileToDecode': 'Select your file to decrypt',
+      'saveFile': 'Save File',
+      'savedFile': 'File saved successfully',
+      'fileSelected': 'File selected',
+      'pleaseSelectFile': 'Please select a file',
+      'saveEncryptedFileDialog': 'Save Encrypted File',
+      'saveDecryptedFileDialog': 'Save Decrypted File',
     },
   };
 
   String get appTitle => _localizedValues[locale.languageCode]!['appTitle']!;
+  String get imageEncodingTab =>
+      _localizedValues[locale.languageCode]!['imageEncodingTab']!;
+  String get textEncoingTab =>
+      _localizedValues[locale.languageCode]!['textEncodingTab']!;
+
   String get encoding => _localizedValues[locale.languageCode]!['encoding']!;
   String get decoding => _localizedValues[locale.languageCode]!['decoding']!;
   String get encryptionKey =>
@@ -87,8 +137,7 @@ class AppLocalizations {
       _localizedValues[locale.languageCode]!['encryptedText']!;
   String get decryptedText =>
       _localizedValues[locale.languageCode]!['decryptedText']!;
-  String get enterText =>
-      _localizedValues[locale.languageCode]!['enterText']!;
+  String get enterText => _localizedValues[locale.languageCode]!['enterText']!;
   String get enterEncryptedText =>
       _localizedValues[locale.languageCode]!['enterEncryptedText']!;
   String get resultHere =>
@@ -123,6 +172,40 @@ class AppLocalizations {
       _localizedValues[locale.languageCode]!['onboardingTitle4']!;
   String get onboardingDescription4 =>
       _localizedValues[locale.languageCode]!['onboardingDescription4']!;
+  String get uploadImageToEncode =>
+      _localizedValues[locale.languageCode]!['uploadImageToEncode']!;
+  String get uploadImageToDecode =>
+      _localizedValues[locale.languageCode]!['uploadImageToDecode']!;
+  String get saveToGallery =>
+      _localizedValues[locale.languageCode]!['saveToGallery']!;
+  String get savedToGallery =>
+      _localizedValues[locale.languageCode]!['savedToGallery']!;
+  String get encryptedFileSelected =>
+      _localizedValues[locale.languageCode]!['encryptedFileSelected']!;
+  String get decryptToView =>
+      _localizedValues[locale.languageCode]!['decryptToView']!;
+  String get encrypted =>
+      _localizedValues[locale.languageCode]!['encrypted']!;
+  String get pleaseSelectImage =>
+      _localizedValues[locale.languageCode]!['pleaseSelectImage']!;
+  String get fileEncodingTab =>
+      _localizedValues[locale.languageCode]!['fileEncodingTab']!;
+  String get uploadFileToEncode =>
+      _localizedValues[locale.languageCode]!['uploadFileToEncode']!;
+  String get uploadFileToDecode =>
+      _localizedValues[locale.languageCode]!['uploadFileToDecode']!;
+  String get saveFile =>
+      _localizedValues[locale.languageCode]!['saveFile']!;
+  String get savedFile =>
+      _localizedValues[locale.languageCode]!['savedFile']!;
+  String get fileSelected =>
+      _localizedValues[locale.languageCode]!['fileSelected']!;
+  String get pleaseSelectFile =>
+      _localizedValues[locale.languageCode]!['pleaseSelectFile']!;
+  String get saveEncryptedFileDialog =>
+      _localizedValues[locale.languageCode]!['saveEncryptedFileDialog']!;
+  String get saveDecryptedFileDialog =>
+      _localizedValues[locale.languageCode]!['saveDecryptedFileDialog']!;
 }
 
 class _AppLocalizationsDelegate
@@ -142,4 +225,3 @@ class _AppLocalizationsDelegate
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
-
