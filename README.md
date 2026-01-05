@@ -1,276 +1,393 @@
-# 🔐 رمزگذار متن (Text Encoder)
-
-<div dir="rtl">
-
-یک اپلیکیشن مدرن و امن برای رمزگذاری و رمزگشایی متن‌ها با استفاده از الگوریتم‌های پیشرفته رمزنگاری.
-
-![Flutter](https://img.shields.io/badge/Flutter-3.10+-02569B?logo=flutter&logoColor=white)
-![Dart](https://img.shields.io/badge/Dart-3.10+-0175C2?logo=dart&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green)
-
-</div>
-
----
-
-## 📋 فهرست مطالب
-
-- [✨ ویژگی‌ها](#-ویژگی‌ها)
-- [🛠️ تکنولوژی‌های استفاده شده](#️-تکنولوژی‌های-استفاده-شده)
-- [📦 نصب و راه‌اندازی](#-نصب-و-راه‌اندازی)
-- [🚀 نحوه استفاده](#-نحوه-استفاده)
-- [🏗️ معماری پروژه](#️-معماری-پروژه)
-- [🔒 امنیت](#-امنیت)
-- [📱 پشتیبانی از پلتفرم‌ها](#-پشتیبانی-از-پلتفرم‌ها)
-- [🤝 مشارکت](#-مشارکت)
-- [📄 لایسنس](#-لایسنس)
-
----
-
-## ✨ ویژگی‌ها
-
-- 🔐 **رمزگذاری امن**: استفاده از الگوریتم AES-256-CBC برای رمزگذاری
-- 🔑 **رمزگذاری با کلید**: هر کاربر می‌تواند کلید اختصاصی خود را تعیین کند
-- 🌐 **پشتیبانی از فارسی**: پشتیبانی کامل از حروف فارسی و Unicode
-- 🎨 **رابط کاربری مدرن**: طراحی دارک، مینیمال و مدرن
-- 📱 **واکنش‌گرا**: سازگار با تمام اندازه‌های صفحه نمایش
-- 🔄 **تبدیل آسان**: تعویض سریع بین حالت رمزگذاری و رمزگشایی
-- 📋 **کپی خودکار**: امکان کپی متن رمزگذاری شده و انتقال به ورودی
-- 🎯 **معماری کلین**: کد تمیز و قابل نگهداری با Clean Architecture
-- 🌐 **PWA (Progressive Web App)**: قابل نصب روی iPhone بدون App Store
-- 📴 **کار آفلاین**: بعد از اولین بار، بدون نیاز به اینترنت کار می‌کند
-
----
-
-## 🛠️ تکنولوژی‌های استفاده شده
-
-- **Flutter** - فریمورک توسعه اپلیکیشن موبایل
-- **Dart** - زبان برنامه‌نویسی
-- **Provider** - مدیریت state
-- **Encrypt** - کتابخانه رمزنگاری AES
-- **Clean Architecture** - معماری نرم‌افزار
-
----
-
-## 📦 نصب و راه‌اندازی
-
-### پیش‌نیازها
-
-قبل از شروع، مطمئن شوید که موارد زیر را نصب کرده‌اید:
-
-- ✅ Flutter SDK (نسخه 3.10 یا بالاتر)
-- ✅ Dart SDK
-- ✅ Android Studio / VS Code با افزونه Flutter
-- ✅ Git
-
-### مراحل نصب
-
-#### 1️⃣ کلون کردن پروژه
-
-```bash
-git clone https://github.com/your-username/text_encoder.git
-cd text_encoder
-```
-
-#### 2️⃣ نصب وابستگی‌ها
-
-```bash
-flutter pub get
-```
-
-#### 3️⃣ اجرای پروژه
-
-برای اجرای اپلیکیشن:
-
-```bash
-flutter run
-```
-
-یا برای اجرا روی دستگاه خاص:
-
-```bash
-# لیست دستگاه‌های متصل
-flutter devices
-
-# اجرا روی دستگاه خاص
-flutter run -d <device-id>
-```
-
-#### 4️⃣ ساخت APK (برای Android)
-
-```bash
-flutter build apk --release
-```
-
-فایل APK در مسیر `build/app/outputs/flutter-apk/app-release.apk` قرار می‌گیرد.
-
----
-
-## 🚀 نحوه استفاده
-
-### 📖 راهنمای گام به گام
-
-#### 🔐 رمزگذاری متن
-
-1. **انتخاب حالت رمزگذاری**
-   - در بالای صفحه، دکمه "رمزگذاری" را انتخاب کنید (به صورت پیش‌فرض انتخاب شده است)
-
-2. **وارد کردن کلید**
-   - در فیلد "کلید رمزگذاری"، کلید مورد نظر خود را وارد کنید
-   - ⚠️ **مهم**: این کلید را به خاطر بسپارید یا در جای امنی نگه دارید
-   - بدون این کلید، نمی‌توانید متن را رمزگشایی کنید!
-
-3. **وارد کردن متن**
-   - در فیلد "متن اصلی"، متن مورد نظر خود را وارد کنید
-   - می‌توانید از حروف فارسی، انگلیسی و سایر کاراکترها استفاده کنید
-
-4. **رمزگذاری**
-   - روی دکمه "رمزگذاری" کلیک کنید
-   - متن رمزگذاری شده در فیلد "متن رمزگذاری شده" نمایش داده می‌شود
-
-5. **کپی و ارسال**
-   - می‌توانید متن رمزگذاری شده را کپی کنید
-   - با استفاده از دکمه "کپی به ورودی"، متن به صورت خودکار به فیلد ورودی کپی می‌شود
-
-#### 🔓 رمزگشایی متن
-
-1. **انتخاب حالت رمزگشایی**
-   - در بالای صفحه، دکمه "رمزگشایی" را انتخاب کنید
-
-2. **وارد کردن کلید**
-   - همان کلیدی که برای رمزگذاری استفاده کرده‌اید را وارد کنید
-   - ⚠️ **توجه**: کلید باید دقیقاً همان کلید قبلی باشد
-
-3. **وارد کردن متن رمزگذاری شده**
-   - متن رمزگذاری شده را در فیلد "متن رمزگذاری شده" وارد کنید
-
-4. **رمزگشایی**
-   - روی دکمه "رمزگشایی" کلیک کنید
-   - متن اصلی در فیلد "متن رمزگشایی شده" نمایش داده می‌شود
-
-### 💡 نکات مهم
-
-- 🔑 **کلید را فراموش نکنید**: بدون کلید، رمزگشایی غیرممکن است
-- 🔄 **کلید یکسان**: برای رمزگذاری و رمزگشایی باید از همان کلید استفاده کنید
-- 📝 **پشتیبانی از فارسی**: می‌توانید از حروف فارسی در متن و کلید استفاده کنید
-- 🎯 **امنیت**: کلید را با کسی که می‌خواهید متن را با او به اشتراک بگذارید، به اشتراک بگذارید
-
----
-
-## 🏗️ معماری پروژه
-
-این پروژه از **Clean Architecture** استفاده می‌کند:
-
-```
-lib/
-├── core/              # کدهای اصلی و مشترک
-│   └── theme/         # تم و استایل اپلیکیشن
-├── data/              # لایه داده
-│   ├── repositories/  # پیاده‌سازی repository ها
-│   └── services/      # سرویس‌های رمزنگاری
-├── domain/            # لایه دامنه
-│   ├── entities/      # موجودیت‌ها
-│   └── repositories/  # رابط‌های repository
-└── presentation/       # لایه نمایش
-    ├── providers/     # State management
-    ├── screens/       # صفحات اپلیکیشن
-    └── widgets/       # ویجت‌های قابل استفاده مجدد
-```
-
-### 📚 توضیح لایه‌ها
-
-- **Domain Layer**: شامل منطق کسب‌وکار و رابط‌های repository
-- **Data Layer**: شامل پیاده‌سازی repository ها و سرویس‌های رمزنگاری
-- **Presentation Layer**: شامل UI، state management و صفحات
-
----
-
-## 🔒 امنیت
-
-### الگوریتم رمزنگاری
-
-این اپلیکیشن از **AES-256-CBC** استفاده می‌کند که یک استاندارد صنعتی برای رمزنگاری است.
-
-### نکات امنیتی
-
-- ✅ استفاده از الگوریتم استاندارد AES-256
-- ✅ کلید از طریق SHA-256 از کلید کاربر استخراج می‌شود
-- ✅ IV (Initialization Vector) به صورت deterministic تولید می‌شود
-- ⚠️ **مهم**: کلید را محرمانه نگه دارید
-- ⚠️ **مهم**: بدون کلید، رمزگشایی غیرممکن است
-
-### ⚠️ هشدار
-
-- این اپلیکیشن برای استفاده‌های عمومی و شخصی طراحی شده است
-- برای اطلاعات حساس (مانند اطلاعات بانکی)، از روش‌های امنیتی اضافی استفاده کنید
-- سورس کد public است، بنابراین الگوریتم قابل مشاهده است، اما بدون کلید نمی‌توان متن را رمزگشایی کرد
-
----
-
-## 📱 پشتیبانی از پلتفرم‌ها
-
-- ✅ Android
-- ✅ iOS
-- ✅ **Web (PWA)** - قابل نصب روی iPhone بدون App Store! 📱
-- ✅ Windows
-- ✅ macOS
-- ✅ Linux
-
-### 🌐 نصب روی iPhone (بدون App Store)
-
-Cypheria یک **Progressive Web App (PWA)** است که می‌توانید آن را مستقیماً روی iPhone خود نصب کنید:
-
-1. Safari را باز کنید
-2. آدرس وب سایت را وارد کنید
-3. روی دکمه **Share** (مربع با فلش) ضربه بزنید
-4. **"Add to Home Screen"** را انتخاب کنید
-5. حالا می‌توانید **بدون اینترنت** از اپ استفاده کنید! 🎉
-
-📖 برای راهنمای کامل، فایل [PWA_INSTALL_GUIDE.md](PWA_INSTALL_GUIDE.md) را مطالعه کنید.
-
----
-
-## 🎨 اسکرین‌شات
-
-> 💡 **نکته**: می‌توانید اسکرین‌شات‌های اپلیکیشن را در این بخش اضافه کنید
-
----
-
-## 🤝 مشارکت
-
-مشارکت شما در بهبود این پروژه بسیار خوشحال‌کننده است! 
-
-### نحوه مشارکت
-
-1. Fork کنید
-2. یک branch جدید بسازید (`git checkout -b feature/AmazingFeature`)
-3. تغییرات خود را commit کنید (`git commit -m 'Add some AmazingFeature'`)
-4. به branch خود push کنید (`git push origin feature/AmazingFeature`)
-5. یک Pull Request باز کنید
-
----
-
-## 📄 لایسنس
-
-این پروژه تحت لایسنس MIT منتشر شده است. برای جزئیات بیشتر، فایل `LICENSE` را مطالعه کنید.
-
----
-
-## 👨‍💻 توسعه‌دهنده
-
-ساخته شده با ❤️ توسط [نام شما]
-
----
-
-## ⭐ ستاره‌ها
-
-اگر این پروژه برای شما مفید بود، لطفاً یک ستاره ⭐ به آن بدهید!
-
----
-
+<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+<a id="readme-top"></a>
+
+<!--
+*** Thanks for checking out Cypheria. If you have a suggestion
+*** that would make this better, please fork the repo and create a pull request
+*** or simply open an issue with the tag "enhancement".
+*** Don't forget to give the project a star!
+*** Thanks again! Now go create something AMAZING! :D
+-->
+
+
+
+<!-- PROJECT SHIELDS -->
+<!--
+*** I'm using markdown "reference style" links for readability.
+*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
+*** See the bottom of this document for the declaration of the reference variables
+*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
+*** https://www.markdownguide.org/basic-syntax/#reference-style-links
+-->
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
+[![LinkedIn][linkedin-shield]][linkedin-url]
+
+
+
+<!-- PROJECT LOGO -->
+<br />
 <div align="center">
+  <a href="https://github.com/your_username/text_encoder">
+    <img src="assets/images/icon.png" alt="Logo" width="80" height="80">
+  </a>
 
-**ساخته شده با Flutter 💙**
+  <h3 align="center">Cypheria</h3>
 
-[مشکلات](https://github.com/your-username/text_encoder/issues) • [درخواست ویژگی](https://github.com/your-username/text_encoder/issues) • [مشارکت](https://github.com/your-username/text_encoder/pulls)
-
+  <p align="center">
+    Secure Encryption & Decryption App - Protect your data with AES-256 encryption
+    <br />
+    <a href="https://github.com/your_username/text_encoder"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/your_username/text_encoder/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    &middot;
+    <a href="https://github.com/your_username/text_encoder/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+  </p>
 </div>
+
+
+
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#built-with">Built With</a></li>
+        <li><a href="#screenshots">Screenshots</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#security">Security</a></li>
+    <li><a href="#platform-support">Platform Support</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
+
+
+
+<!-- ABOUT THE PROJECT -->
+## About The Project
+
+[![Product Name Screen Shot][product-screenshot]](https://example.com)
+
+Cypheria is a powerful, secure encryption application that allows you to encrypt and decrypt text, images, files, and audio files using AES-256 encryption. All processing happens locally on your device—your data never leaves your phone.
+
+Here's why Cypheria stands out:
+* 🔐 **Military-Grade Security**: Uses AES-256-CBC encryption algorithm
+* 📱 **Works Offline**: No internet connection required for encryption/decryption
+* 🔒 **Privacy First**: Your data never leaves your device
+* 🌐 **Multi-Platform**: Available on Android, iOS, Web, Windows, macOS, and Linux
+* 🎨 **Beautiful UI**: Modern dark and light themes with responsive design
+* 🌍 **Multi-Language**: Supports Persian and English
+* 💬 **Speech to Text**: Convert speech to text on Android devices
+
+Of course, no encryption app is perfect, and we're always looking to improve. If you have suggestions or find bugs, please open an issue or submit a pull request!
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+### Features
+
+* 🔐 **Encrypt Everything**: Text, images, files, and audio files
+* 🔑 **Custom Keys**: Use your own encryption keys
+* 🌐 **Unicode Support**: Full support for Persian, English, and other Unicode characters
+* 🎨 **Modern UI**: Beautiful dark and light themes
+* 📱 **Responsive**: Works on all screen sizes
+* 🔄 **Easy Toggle**: Quick switch between encryption and decryption modes
+* 📋 **Copy & Paste**: Easy text copying and transfer
+* 🏗️ **Clean Architecture**: Maintainable and scalable codebase
+* 🌐 **PWA Support**: Install on iPhone without App Store
+* 📴 **Offline First**: Works completely offline after initial load
+* 💬 **Speech to Text**: Voice input on Android (Persian and English)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+### Built With
+
+This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section.
+
+* [![Flutter][Flutter.dev]][Flutter-url]
+* [![Dart][Dart.dev]][Dart-url]
+* [![Provider][Provider.dev]][Provider-url]
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+### Screenshots
+
+> 💡 **Note**: Add screenshots of your application here
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- GETTING STARTED -->
+## Getting Started
+
+This is an example of how you may give instructions on setting up your project locally.
+To get a local copy up and running follow these simple example steps.
+
+### Prerequisites
+
+This is an example of how to list things you need to use the software and how to install them.
+* Flutter SDK (version 3.10 or higher)
+  ```sh
+  flutter --version
+  ```
+* Dart SDK (comes with Flutter)
+* Android Studio / VS Code with Flutter extension
+* Git
+
+### Installation
+
+_Below is an example of how you can instruct your audience on installing and setting up your app._
+
+1. Clone the repo
+   ```sh
+   git clone https://github.com/your_username/text_encoder.git
+   cd text_encoder
+   ```
+2. Install dependencies
+   ```sh
+   flutter pub get
+   ```
+3. Run the app
+   ```sh
+   flutter run
+   ```
+4. Build for release
+   ```sh
+   # Android
+   flutter build apk --release
+   
+   # iOS
+   flutter build ios --release
+   
+   # Web
+   flutter build web
+   ```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- USAGE EXAMPLES -->
+## Usage
+
+### Encrypting Text
+
+1. Select **Encoding** mode (default)
+2. Enter your encryption key (remember this key!)
+3. Enter the text you want to encrypt
+4. Click **Encode** button
+5. Copy the encrypted text
+
+### Decrypting Text
+
+1. Select **Decoding** mode
+2. Enter the same encryption key you used for encryption
+3. Enter the encrypted text
+4. Click **Decode** button
+5. View the decrypted text
+
+### Encrypting Images/Files/Audio
+
+1. Select the appropriate tab (Image/File/Audio)
+2. Choose encoding or decoding mode
+3. Select the file from your device
+4. Enter your encryption key
+5. Click **Encode** or **Decode** button
+6. Save or share the result
+
+### Important Notes
+
+* ⚠️ **Remember your key**: Without the encryption key, decryption is impossible
+* ⚠️ **Same key required**: Use the same key for encryption and decryption
+* ⚠️ **Key security**: Share your key only with trusted parties
+* ✅ **Unicode support**: You can use Persian, English, and other Unicode characters
+
+_For more examples, please refer to the [Documentation](https://example.com)_
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- SECURITY -->
+## Security
+
+### Encryption Algorithm
+
+Cypheria uses **AES-256-CBC** encryption, which is an industry-standard encryption algorithm.
+
+### Security Features
+
+* ✅ AES-256 encryption algorithm
+* ✅ Key derivation using SHA-256
+* ✅ Deterministic IV generation
+* ✅ All processing happens locally
+* ✅ No data transmission to servers
+
+### Security Warnings
+
+* ⚠️ **Keep your key secret**: Never share your encryption key publicly
+* ⚠️ **No key recovery**: We cannot recover lost keys
+* ⚠️ **Source code is public**: The algorithm is visible, but without the key, data cannot be decrypted
+* ⚠️ **For general use**: This app is designed for general and personal use. For highly sensitive data (like banking information), use additional security measures.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- PLATFORM SUPPORT -->
+## Platform Support
+
+* ✅ **Android** - Full support including speech-to-text
+* ✅ **iOS** - Full support (speech-to-text disabled)
+* ✅ **Web (PWA)** - Install on iPhone without App Store
+* ✅ **Windows** - Full support
+* ✅ **macOS** - Full support
+* ✅ **Linux** - Full support
+
+### Installing on iPhone (Without App Store)
+
+Cypheria is a **Progressive Web App (PWA)** that you can install directly on your iPhone:
+
+1. Open Safari
+2. Navigate to the website
+3. Tap the **Share** button (square with arrow)
+4. Select **"Add to Home Screen"**
+5. Now you can use the app **offline**! 🎉
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- ROADMAP -->
+## Roadmap
+
+- [x] Text encryption/decryption
+- [x] Image encryption/decryption
+- [x] File encryption/decryption
+- [x] Audio encryption/decryption
+- [x] Dark and light themes
+- [x] Persian and English support
+- [x] Speech to text (Android)
+- [x] PWA support
+- [ ] Cloud backup (optional)
+- [ ] Key management system
+- [ ] Multi-language support (more languages)
+- [ ] Biometric authentication
+- [ ] Export/import encrypted files
+
+See the [open issues](https://github.com/your_username/text_encoder/issues) for a full list of proposed features (and known issues).
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- CONTRIBUTING -->
+## Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Don't forget to give the project a star! Thanks again!
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+### Top contributors:
+
+<a href="https://github.com/your_username/text_encoder/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=your_username/text_encoder" alt="contrib.rocks image" />
+</a>
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- LICENSE -->
+## License
+
+Distributed under the MIT License. See `LICENSE.txt` for more information.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- CONTACT -->
+## Contact
+
+Your Name - [@your_twitter](https://twitter.com/your_username) - email@example.com
+
+Project Link: [https://github.com/your_username/text_encoder](https://github.com/your_username/text_encoder)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+Use this space to list resources you find helpful and would like to give credit to. I've included a few of my favorites to kick things off!
+
+* [Flutter Documentation](https://flutter.dev/docs)
+* [Dart Language](https://dart.dev)
+* [Provider Package](https://pub.dev/packages/provider)
+* [Encrypt Package](https://pub.dev/packages/encrypt)
+* [Choose an Open Source License](https://choosealicense.com)
+* [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
+* [Img Shields](https://shields.io)
+* [GitHub Pages](https://pages.github.com)
+* [Best README Template](https://github.com/othneildrew/Best-README-Template)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/your_username/text_encoder.svg?style=for-the-badge
+[contributors-url]: https://github.com/your_username/text_encoder/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/your_username/text_encoder.svg?style=for-the-badge
+[forks-url]: https://github.com/your_username/text_encoder/network/members
+[stars-shield]: https://img.shields.io/github/stars/your_username/text_encoder.svg?style=for-the-badge
+[stars-url]: https://github.com/your_username/text_encoder/stargazers
+[issues-shield]: https://img.shields.io/github/issues/your_username/text_encoder.svg?style=for-the-badge
+[issues-url]: https://github.com/your_username/text_encoder/issues
+[license-shield]: https://img.shields.io/github/license/your_username/text_encoder.svg?style=for-the-badge
+[license-url]: https://github.com/your_username/text_encoder/blob/master/LICENSE.txt
+[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+[linkedin-url]: https://linkedin.com/in/your_username
+[product-screenshot]: assets/images/icon.png
+[Flutter.dev]: https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white
+[Flutter-url]: https://flutter.dev
+[Dart.dev]: https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white
+[Dart-url]: https://dart.dev
+[Provider.dev]: https://img.shields.io/badge/Provider-6.1.1-6366F1?style=for-the-badge
+[Provider-url]: https://pub.dev/packages/provider
