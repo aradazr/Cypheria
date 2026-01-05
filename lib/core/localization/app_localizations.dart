@@ -141,6 +141,11 @@ class AppLocalizations {
       'switchToEnglish': 'تغییر به انگلیسی',
       'switchToDark': 'تغییر به تم دارک',
       'switchToLight': 'تغییر به تم روشن',
+      'errorDecryptingText': 'خطا در رمزگشایی متن',
+      'speechRecognitionFailed': 'تشخیص گفتار با خطا مواجه شد. لطفاً دسترسی میکروفون را بررسی کنید و دوباره تلاش کنید',
+      'speechRecognitionFailedIOS': 'تشخیص گفتار فارسی در iOS پشتیبانی نمی‌شود. لطفاً از انگلیسی استفاده کنید یا متن را تایپ کنید',
+      'goToSettingsEnableMicrophone': 'لطفاً به تنظیمات بروید و دسترسی میکروفون را فعال کنید',
+      'error': 'خطا',
     },
     'en': {
       'appTitle': 'Cypheria',
@@ -265,6 +270,11 @@ class AppLocalizations {
       'switchToEnglish': 'Switch to English',
       'switchToDark': 'Switch to Dark Theme',
       'switchToLight': 'Switch to Light Theme',
+      'errorDecryptingText': 'Error decrypting text',
+      'speechRecognitionFailed': 'Speech recognition failed. Please check microphone permission and try again',
+      'speechRecognitionFailedIOS': 'Speech recognition failed. Please check microphone permission and try again',
+      'goToSettingsEnableMicrophone': 'Please go to Settings and enable microphone access',
+      'error': 'Error',
     },
   };
 
@@ -496,6 +506,16 @@ class AppLocalizations {
       _localizedValues[locale.languageCode]!['switchToDark']!;
   String get switchToLight =>
       _localizedValues[locale.languageCode]!['switchToLight']!;
+  String get errorDecryptingText =>
+      _localizedValues[locale.languageCode]!['errorDecryptingText']!;
+  String get speechRecognitionFailed =>
+      _localizedValues[locale.languageCode]!['speechRecognitionFailed']!;
+  String get speechRecognitionFailedIOS =>
+      _localizedValues[locale.languageCode]!['speechRecognitionFailedIOS']!;
+  String get goToSettingsEnableMicrophone =>
+      _localizedValues[locale.languageCode]!['goToSettingsEnableMicrophone']!;
+  String get error =>
+      _localizedValues[locale.languageCode]!['error']!;
 }
 
 class _AppLocalizationsDelegate

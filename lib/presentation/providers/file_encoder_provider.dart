@@ -73,7 +73,7 @@ class FileEncoderProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      _errorMessage = 'خطا در انتخاب فایل: $e';
+      _errorMessage = '${_getLocalizedString('errorSelectingFile')}: ${e.toString().replaceAll('Exception: ', '')}';
       debugPrint('ERROR [FileEncoderProvider.pickFileToEncode]: $_errorMessage');
       debugPrint('ERROR StackTrace: ${StackTrace.current}');
       notifyListeners();
@@ -138,15 +138,15 @@ class FileEncoderProvider extends ChangeNotifier {
 
     try {
       if (key.isEmpty) {
-        throw Exception('لطفاً کلید رمزگذاری را وارد کنید');
+        throw Exception(_getLocalizedString('pleaseEnterEncryptionKey'));
       }
 
       if (key.length < 3) {
-        throw Exception('کلید رمزگذاری باید حداقل ۳ کاراکتر باشد');
+        throw Exception(_getLocalizedString('encryptionKeyMinLength'));
       }
 
       if (!await file.exists()) {
-        throw Exception('فایل وجود ندارد');
+        throw Exception(_getLocalizedString('fileNotFound'));
       }
 
       // Store original file before encoding (if not already stored)

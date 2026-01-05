@@ -109,15 +109,15 @@ class ImageEncoderProvider extends ChangeNotifier {
 
     try {
       if (key.isEmpty) {
-        throw Exception('لطفاً کلید رمزگذاری را وارد کنید');
+        throw Exception(_getLocalizedString('pleaseEnterEncryptionKey'));
       }
 
       if (key.length < 3) {
-        throw Exception('کلید رمزگذاری باید حداقل ۳ کاراکتر باشد');
+        throw Exception(_getLocalizedString('encryptionKeyMinLength'));
       }
 
       if (!await file.exists()) {
-        throw Exception('فایل وجود ندارد');
+        throw Exception(_getLocalizedString('fileNotFound'));
       }
 
       // Store original image before encoding (if not already stored)

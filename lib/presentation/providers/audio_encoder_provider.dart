@@ -150,10 +150,7 @@ class AudioEncoderProvider extends ChangeNotifier {
       // Check permission first
       if (!await _checkMicrophonePermission()) {
         if (_isPermissionPermanentlyDenied) {
-          _errorMessage = _getLocalizedString('errorRecordingAudio') + 
-              ' - ' + (_locale.languageCode == 'fa' 
-                  ? 'لطفاً به تنظیمات بروید و دسترسی میکروفون را فعال کنید'
-                  : 'Please go to Settings and enable microphone access');
+          _errorMessage = '${_getLocalizedString('errorRecordingAudio')} - ${_getLocalizedString('goToSettingsEnableMicrophone')}';
         } else {
           _errorMessage = _getLocalizedString('errorRecordingAudio');
         }

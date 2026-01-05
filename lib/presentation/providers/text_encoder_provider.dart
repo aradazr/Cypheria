@@ -97,7 +97,7 @@ class TextEncoderProvider extends ChangeNotifier {
     if (_inputText.isEmpty) {
       _errorMessage = context != null
           ? _getLocalizedError(context, 'pleaseEnterText')
-          : 'Please enter text';
+          : _getLocalizedString('pleaseEnterText');
       notifyListeners();
       return;
     }
@@ -105,7 +105,7 @@ class TextEncoderProvider extends ChangeNotifier {
     if (_key.isEmpty) {
       _errorMessage = context != null
           ? _getLocalizedError(context, 'pleaseEnterKey')
-          : 'Please enter key';
+          : _getLocalizedString('pleaseEnterKey');
       notifyListeners();
       return;
     }
@@ -133,7 +133,15 @@ class TextEncoderProvider extends ChangeNotifier {
         errorMsg = errorMsg.substring(11); // Remove 'Exception: ' prefix
       }
 
-      _errorMessage = errorMsg;
+      // Use localized error message
+      if (errorMsg.contains('decrypt') || errorMsg.contains('Decrypt')) {
+        _errorMessage = _getLocalizedString('errorDecryptingText');
+      } else {
+        // Try to get localized version if it matches a known key
+        _errorMessage = _getLocalizedString(errorMsg) != errorMsg
+            ? _getLocalizedString(errorMsg)
+            : errorMsg;
+      }
       _outputText = '';
     } finally {
       _isProcessing = false;
@@ -149,9 +157,9 @@ class TextEncoderProvider extends ChangeNotifier {
             ? localizations.pleaseEnterText
             : localizations.pleaseEnterKey;
       }
-      return 'Error';
+      return _getLocalizedString('error');
     } catch (e) {
-      return 'Error';
+      return _getLocalizedString('error');
     }
   }
 
@@ -320,9 +328,11 @@ class TextEncoderProvider extends ChangeNotifier {
 
       // Provide more specific error message
       if (e.toString().contains('ListenFailedException')) {
-        _errorMessage = _locale.languageCode == 'fa'
-            ? 'تشخیص گفتار فارسی در iOS پشتیبانی نمی‌شود. لطفاً از انگلیسی استفاده کنید یا متن را تایپ کنید.'
-            : 'Speech recognition failed. Please check microphone permission and try again.';
+        if (Platform.isIOS && _locale.languageCode == 'fa') {
+          _errorMessage = _getLocalizedString('speechRecognitionFailedIOS');
+        } else {
+          _errorMessage = _getLocalizedString('speechRecognitionFailed');
+        }
       } else {
         _errorMessage = _getLocalizedString('speechPermissionDenied');
       }
