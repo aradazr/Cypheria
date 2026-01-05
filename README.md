@@ -31,7 +31,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/your_username/text_encoder">
+  <a href="https://github.com/aradazr/Cypheria">
     <img src="assets/images/icon.png" alt="Logo" width="80" height="80">
   </a>
 
@@ -40,12 +40,12 @@
   <p align="center">
     Secure Encryption & Decryption App - Protect your data with AES-256 encryption
     <br />
-    <a href="https://github.com/your_username/text_encoder"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/aradazr/Cypheria"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/your_username/text_encoder/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    <a href="https://github.com/aradazr/Cypheria/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     &middot;
-    <a href="https://github.com/your_username/text_encoder/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+    <a href="https://github.com/aradazr/Cypheria/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
@@ -86,7 +86,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+[![Product Name Screen Shot][product-screenshot]](https://github.com/aradazr/Cypheria)
 
 Cypheria is a powerful, secure encryption application that allows you to encrypt and decrypt text, images, files, and audio files using AES-256 encryption. All processing happens locally on your device—your data never leaves your phone.
 
@@ -125,7 +125,7 @@ Of course, no encryption app is perfect, and we're always looking to improve. If
 
 ### Built With
 
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section.
+Major frameworks and libraries used in this project:
 
 * [![Flutter][Flutter.dev]][Flutter-url]
 * [![Dart][Dart.dev]][Dart-url]
@@ -146,12 +146,11 @@ This section should list any major frameworks/libraries used to bootstrap your p
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+To get a local copy up and running, follow these simple steps.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
+Before you begin, ensure you have the following installed:
 * Flutter SDK (version 3.10 or higher)
   ```sh
   flutter --version
@@ -162,12 +161,10 @@ This is an example of how to list things you need to use the software and how to
 
 ### Installation
 
-_Below is an example of how you can instruct your audience on installing and setting up your app._
-
 1. Clone the repo
    ```sh
-   git clone https://github.com/your_username/text_encoder.git
-   cd text_encoder
+   git clone https://github.com/aradazr/Cypheria.git
+   cd Cypheria
    ```
 2. Install dependencies
    ```sh
@@ -228,7 +225,7 @@ _Below is an example of how you can instruct your audience on installing and set
 * ⚠️ **Key security**: Share your key only with trusted parties
 * ✅ **Unicode support**: You can use Persian, English, and other Unicode characters
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+_For more information, visit the [GitHub repository](https://github.com/aradazr/Cypheria)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -301,7 +298,7 @@ Cypheria is a **Progressive Web App (PWA)** that you can install directly on you
 - [ ] Biometric authentication
 - [ ] Export/import encrypted files
 
-See the [open issues](https://github.com/your_username/text_encoder/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/aradazr/Cypheria/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -323,8 +320,8 @@ Don't forget to give the project a star! Thanks again!
 
 ### Top contributors:
 
-<a href="https://github.com/your_username/text_encoder/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=your_username/text_encoder" alt="contrib.rocks image" />
+<a href="https://github.com/aradazr/Cypheria/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=aradazr/Cypheria" alt="contrib.rocks image" />
 </a>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -343,9 +340,9 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@your_twitter](https://twitter.com/your_username) - email@example.com
+Arad Azarpanah - [@aradazarpanah](https://twitter.com/aradazarpanah) - aradazarpanah27@gmail.com
 
-Project Link: [https://github.com/your_username/text_encoder](https://github.com/your_username/text_encoder)
+Project Link: [https://github.com/aradazr/Cypheria](https://github.com/aradazr/Cypheria)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -372,18 +369,18 @@ Use this space to list resources you find helpful and would like to give credit 
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/your_username/text_encoder.svg?style=for-the-badge
-[contributors-url]: https://github.com/your_username/text_encoder/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/your_username/text_encoder.svg?style=for-the-badge
-[forks-url]: https://github.com/your_username/text_encoder/network/members
-[stars-shield]: https://img.shields.io/github/stars/your_username/text_encoder.svg?style=for-the-badge
-[stars-url]: https://github.com/your_username/text_encoder/stargazers
-[issues-shield]: https://img.shields.io/github/issues/your_username/text_encoder.svg?style=for-the-badge
-[issues-url]: https://github.com/your_username/text_encoder/issues
-[license-shield]: https://img.shields.io/github/license/your_username/text_encoder.svg?style=for-the-badge
-[license-url]: https://github.com/your_username/text_encoder/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/aradazr/Cypheria.svg?style=for-the-badge
+[contributors-url]: https://github.com/aradazr/Cypheria/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/aradazr/Cypheria.svg?style=for-the-badge
+[forks-url]: https://github.com/aradazr/Cypheria/network/members
+[stars-shield]: https://img.shields.io/github/stars/aradazr/Cypheria.svg?style=for-the-badge
+[stars-url]: https://github.com/aradazr/Cypheria/stargazers
+[issues-shield]: https://img.shields.io/github/issues/aradazr/Cypheria.svg?style=for-the-badge
+[issues-url]: https://github.com/aradazr/Cypheria/issues
+[license-shield]: https://img.shields.io/github/license/aradazr/Cypheria.svg?style=for-the-badge
+[license-url]: https://github.com/aradazr/Cypheria/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/your_username
+[linkedin-url]: https://linkedin.com/in/aradazr
 [product-screenshot]: assets/images/icon.png
 [Flutter.dev]: https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white
 [Flutter-url]: https://flutter.dev
