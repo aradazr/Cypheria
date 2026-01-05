@@ -7,6 +7,7 @@ import '../providers/text_encoder_provider.dart';
 import '../screens/text_encoder_layout.dart';
 import '../screens/image_encoder_layout.dart';
 import '../screens/file_encoder_layout.dart';
+import '../screens/audio_encoder_layout.dart';
 
 import '../widgets/tab_switch_button.dart';
 import '../widgets/settings_bar.dart';
@@ -60,11 +61,13 @@ class HomeScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             if (provider.currentTab == TabType.text)
-                              TextEncoderLayout()
+                              const TextEncoderLayout()
                             else if (provider.currentTab == TabType.image)
-                              ImageEncoderLayout()
+                              const ImageEncoderLayout()
                             else if (provider.currentTab == TabType.file)
-                              FileEncoderLayout(),
+                              const FileEncoderLayout()
+                            else if (provider.currentTab == TabType.audio)
+                              const AudioEncoderLayout(),
                           ],
                         ),
                       ),

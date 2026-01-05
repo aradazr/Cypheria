@@ -93,7 +93,7 @@ class ModeSwitchButton extends StatelessWidget {
                 color: Theme.of(context).textTheme.bodyLarge?.color,
                 fontWeight: FontWeight.w600,
                 fontSize: Responsive.fontSize(context, 14, 16, 18),
-                fontFamily: 'PelakFA',
+                fontFamily: Responsive.getFontFamily(context),
               ),
             ),
           ],

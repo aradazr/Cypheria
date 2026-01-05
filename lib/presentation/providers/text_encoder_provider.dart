@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../../domain/repositories/text_encoder_repository.dart';
 import '../../data/repositories/text_encoder_repository_impl.dart';
 import '../../core/localization/app_localizations.dart';
 
-enum TabType { text, image, file }
+enum TabType { text, image, file, audio }
 
 class TextEncoderProvider extends ChangeNotifier {
   final TextEncoderRepository _repository = TextEncoderRepositoryImpl();
+  final stt.SpeechToText _speech = stt.SpeechToText();
 
   String _inputText = '';
   String _key = '';
@@ -16,6 +18,9 @@ class TextEncoderProvider extends ChangeNotifier {
 
   bool _isProcessing = false;
   String? _errorMessage;
+  bool _isListening = false;
+  bool _speechAvailable = false;
+  Locale _locale = const Locale('fa', 'IR');
 
   String get inputText => _inputText;
   String get key => _key;
@@ -26,6 +31,16 @@ class TextEncoderProvider extends ChangeNotifier {
 
   bool get isProcessing => _isProcessing;
   String? get errorMessage => _errorMessage;
+  bool get isListening => _isListening;
+  bool get speechAvailable => _speechAvailable;
+
+  void setLocale(Locale locale) {
+    _locale = locale;
+  }
+
+  String _getLocalizedString(String key) {
+    return AppLocalizations.getString(_locale, key);
+  }
 
   void setInputText(String text) {
     _inputText = text;
@@ -57,7 +72,7 @@ class TextEncoderProvider extends ChangeNotifier {
   }
 
   void toggleTab() {
-    // Cycle through tabs: text -> image -> file -> text
+    // Cycle through tabs: text -> image -> file -> audio -> text
     switch (_currentTab) {
       case TabType.text:
         _currentTab = TabType.image;
@@ -66,6 +81,9 @@ class TextEncoderProvider extends ChangeNotifier {
         _currentTab = TabType.file;
         break;
       case TabType.file:
+        _currentTab = TabType.audio;
+        break;
+      case TabType.audio:
         _currentTab = TabType.text;
         break;
     }
@@ -147,5 +165,76 @@ class TextEncoderProvider extends ChangeNotifier {
     _outputText = '';
     _errorMessage = null;
     notifyListeners();
+  }
+
+  Future<void> initializeSpeech() async {
+    _speechAvailable = await _speech.initialize(
+      onStatus: (status) {
+        if (status == 'done' || status == 'notListening') {
+          _isListening = false;
+          notifyListeners();
+        }
+      },
+      onError: (error) {
+        _isListening = false;
+        _errorMessage = _getLocalizedString('speechNotAvailable');
+        notifyListeners();
+      },
+    );
+    notifyListeners();
+  }
+
+  Future<void> startListening() async {
+    if (!_speechAvailable) {
+      await initializeSpeech();
+    }
+
+    if (!_speechAvailable) {
+      _errorMessage = _getLocalizedString('speechNotAvailable');
+      notifyListeners();
+      return;
+    }
+
+    if (_isListening) {
+      await stopListening();
+      return;
+    }
+
+    try {
+      await _speech.listen(
+        onResult: (result) {
+          if (result.finalResult) {
+            _inputText = result.recognizedWords;
+            _isListening = false;
+          } else {
+            _inputText = result.recognizedWords;
+          }
+          notifyListeners();
+        },
+        localeId: _locale.languageCode == 'fa' ? 'fa_IR' : 'en_US',
+      );
+      _isListening = true;
+      _errorMessage = null;
+      notifyListeners();
+    } catch (e) {
+      _isListening = false;
+      _errorMessage = _getLocalizedString('speechPermissionDenied');
+      notifyListeners();
+    }
+  }
+
+  Future<void> stopListening() async {
+    if (_isListening) {
+      await _speech.stop();
+      _isListening = false;
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    _speech.stop();
+    _speech.cancel();
+    super.dispose();
   }
 }

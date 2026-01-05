@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../data/services/file_service.dart';
 
 class FileEncoderProvider extends ChangeNotifier {
@@ -17,6 +19,15 @@ class FileEncoderProvider extends ChangeNotifier {
   bool isLoadingEncode = false;
   bool isLoadingDecode = false;
   String? _errorMessage;
+  Locale _locale = const Locale('fa', 'IR');
+
+  void setLocale(Locale locale) {
+    _locale = locale;
+  }
+
+  String _getLocalizedString(String key) {
+    return AppLocalizations.getString(_locale, key);
+  }
   String? selectedFileName;
   String? originalFileName; // Keep original file name for display
 
@@ -85,7 +96,7 @@ class FileEncoderProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      _errorMessage = 'خطا در انتخاب فایل: $e';
+      _errorMessage = '${_getLocalizedString('errorSelectingFile')}: $e';
       notifyListeners();
     }
   }
@@ -167,15 +178,15 @@ class FileEncoderProvider extends ChangeNotifier {
 
     try {
       if (key.isEmpty) {
-        throw Exception('لطفاً کلید رمزگذاری را وارد کنید');
+        throw Exception(_getLocalizedString('pleaseEnterEncryptionKey'));
       }
 
       if (key.length < 3) {
-        throw Exception('کلید رمزگذاری باید حداقل ۳ کاراکتر باشد');
+        throw Exception(_getLocalizedString('encryptionKeyMinLength'));
       }
 
       if (!await file.exists()) {
-        throw Exception('فایل وجود ندارد');
+        throw Exception(_getLocalizedString('fileNotFound'));
       }
 
       // Store encrypted file before decoding (if not already stored)
@@ -204,7 +215,7 @@ class FileEncoderProvider extends ChangeNotifier {
 
   Future<void> saveEncodedFile(String dialogTitle) async {
     if (selectedFileToEncode == null) {
-      _errorMessage = 'هیچ فایل رمزگذاری شده‌ای برای ذخیره وجود ندارد';
+      _errorMessage = _getLocalizedString('noEncryptedFileToSave');
       notifyListeners();
       return;
     }
@@ -237,21 +248,21 @@ class FileEncoderProvider extends ChangeNotifier {
       }
     } catch (e) {
       _errorMessage =
-          'خطا در ذخیره فایل: ${e.toString().replaceAll('Exception: ', '')}';
+          '${_getLocalizedString('errorSavingFile')}: ${e.toString().replaceAll('Exception: ', '')}';
       notifyListeners();
     }
   }
 
   Future<void> saveDecodedFile(String dialogTitle) async {
     if (selectedFileToDecode == null || !isDecoded) {
-      _errorMessage = 'هیچ فایل رمزگشایی شده‌ای برای ذخیره وجود ندارد';
+      _errorMessage = _getLocalizedString('noDecryptedFileToSave');
       notifyListeners();
       return;
     }
 
     // Ensure we're using the decoded file, not the encrypted one
     if (selectedFileToDecode!.path == originalFileToDecode?.path) {
-      _errorMessage = 'خطا: فایل رمزگشایی نشده است';
+      _errorMessage = _getLocalizedString('fileNotDecrypted');
       notifyListeners();
       return;
     }
@@ -282,7 +293,52 @@ class FileEncoderProvider extends ChangeNotifier {
       }
     } catch (e) {
       _errorMessage =
-          'خطا در ذخیره فایل: ${e.toString().replaceAll('Exception: ', '')}';
+          '${_getLocalizedString('errorSavingFile')}: ${e.toString().replaceAll('Exception: ', '')}';
+      notifyListeners();
+    }
+  }
+
+  Future<void> shareEncodedFile() async {
+    if (selectedFileToEncode == null) {
+      _errorMessage = _getLocalizedString('noEncryptedFileToShare');
+      notifyListeners();
+      return;
+    }
+
+    try {
+      await Share.shareXFiles(
+        [XFile(selectedFileToEncode!.path)],
+        text: _getLocalizedString('encryptedFile'),
+      );
+      _errorMessage = null;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
+    }
+  }
+
+  Future<void> shareDecodedFile() async {
+    if (selectedFileToDecode == null || !isDecoded) {
+      _errorMessage = _getLocalizedString('noDecryptedFileToShare');
+      notifyListeners();
+      return;
+    }
+
+    // Ensure we're using the decoded file, not the encrypted one
+    if (selectedFileToDecode!.path == originalFileToDecode?.path) {
+      _errorMessage = _getLocalizedString('fileNotDecrypted');
+      notifyListeners();
+      return;
+    }
+
+    try {
+      await Share.shareXFiles(
+        [XFile(selectedFileToDecode!.path)],
+        text: _getLocalizedString('decryptedFile'),
+      );
+      _errorMessage = null;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
       notifyListeners();
     }
   }

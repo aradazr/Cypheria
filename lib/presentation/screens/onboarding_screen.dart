@@ -100,7 +100,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         localizations.skip,
                         style: TextStyle(
                           fontSize: Responsive.fontSize(context, 14, 16, 18),
-                          fontFamily: 'PelakFA',
+                          fontFamily: Responsive.getFontFamily(context),
                         ),
                       ),
                     ),
@@ -171,7 +171,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       style: TextStyle(
                         fontSize: Responsive.fontSize(context, 16, 18, 20),
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'PelakFA',
+                        fontFamily: Responsive.getFontFamily(context),
                       ),
                     ),
                   ),
@@ -221,7 +221,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             style: TextStyle(
               fontSize: Responsive.fontSize(context, 24, 28, 32),
               fontWeight: FontWeight.bold,
-              fontFamily: 'PelakFA',
+              fontFamily: Responsive.getFontFamily(context),
               color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
@@ -235,7 +235,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
             style: TextStyle(
               fontSize: Responsive.fontSize(context, 16, 18, 20),
-              fontFamily: 'PelakFA',
+              fontFamily: Responsive.getFontFamily(context),
               color: Theme.of(context).textTheme.bodyMedium?.color,
               height: 1.6,
             ),

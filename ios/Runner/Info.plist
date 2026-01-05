@@ -51,5 +51,9 @@
 	<string>برای ذخیره تصاویر در گالری نیاز به دسترسی داریم</string>
 	<key>NSCameraUsageDescription</key>
 	<string>برای گرفتن عکس از دوربین نیاز به دسترسی داریم</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>برای ضبط صدا و تبدیل صدا به متن نیاز به دسترسی به میکروفون داریم</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>برای تبدیل صدا به متن نیاز به دسترسی به تشخیص گفتار داریم</string>
 </dict>
 </plist>

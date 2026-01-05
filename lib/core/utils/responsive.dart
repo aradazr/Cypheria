@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
 class Responsive {
+  // Get font family based on locale
+  static String? getFontFamily(BuildContext context) {
+    final locale = Localizations.localeOf(context);
+    return locale.languageCode == 'fa' ? 'PelakFA' : null;
+  }
   static double _screenWidth(BuildContext context) =>
       MediaQuery.of(context).size.width;
 

@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:share_plus/share_plus.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../data/services/image_service.dart';
 
 class ImageEncoderProvider extends ChangeNotifier {
@@ -17,10 +19,19 @@ class ImageEncoderProvider extends ChangeNotifier {
   bool isLoadingEncode = false;
   bool isLoadingDecode = false;
   String? _errorMessage;
+  Locale _locale = const Locale('fa', 'IR');
 
   bool get isEncoding => _isEncoding;
   ImagePicker get picker => _picker;
   String? get errorMessage => _errorMessage;
+
+  void setLocale(Locale locale) {
+    _locale = locale;
+  }
+
+  String _getLocalizedString(String key) {
+    return AppLocalizations.getString(_locale, key);
+  }
 
   void toggleMode() {
     _isEncoding = !_isEncoding;
@@ -41,7 +52,7 @@ class ImageEncoderProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      _errorMessage = 'خطا در انتخاب تصویر: $e';
+      _errorMessage = '${_getLocalizedString('errorSelectingImage')}: $e';
       notifyListeners();
     }
   }
@@ -59,7 +70,7 @@ class ImageEncoderProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      _errorMessage = 'خطا در انتخاب تصویر: $e';
+      _errorMessage = '${_getLocalizedString('errorSelectingImage')}: $e';
       notifyListeners();
     }
   }
@@ -134,15 +145,15 @@ class ImageEncoderProvider extends ChangeNotifier {
 
     try {
       if (key.isEmpty) {
-        throw Exception('لطفاً کلید رمزگذاری را وارد کنید');
+        throw Exception(_getLocalizedString('pleaseEnterEncryptionKey'));
       }
 
       if (key.length < 3) {
-        throw Exception('کلید رمزگذاری باید حداقل ۳ کاراکتر باشد');
+        throw Exception(_getLocalizedString('encryptionKeyMinLength'));
       }
 
       if (!await file.exists()) {
-        throw Exception('فایل وجود ندارد');
+        throw Exception(_getLocalizedString('fileNotFound'));
       }
 
       // Store encrypted file before decoding (if not already stored)
@@ -166,7 +177,7 @@ class ImageEncoderProvider extends ChangeNotifier {
 
   Future<void> saveEncodedImage() async {
     if (selectedImageToEncode == null) {
-      _errorMessage = 'هیچ تصویر رمزگذاری شده‌ای برای ذخیره وجود ندارد';
+      _errorMessage = _getLocalizedString('noEncryptedImageToSave');
       notifyListeners();
       return;
     }
@@ -182,13 +193,51 @@ class ImageEncoderProvider extends ChangeNotifier {
 
   Future<void> saveDecodedImage() async {
     if (selectedImageToDecode == null) {
-      _errorMessage = 'هیچ تصویر رمزگشایی شده‌ای برای ذخیره وجود ندارد';
+      _errorMessage = _getLocalizedString('noDecryptedImageToSave');
       notifyListeners();
       return;
     }
 
     try {
       await saveToGallery(selectedImageToDecode!);
+      _errorMessage = null;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
+    }
+  }
+
+  Future<void> shareEncodedImage() async {
+    if (selectedImageToEncode == null) {
+      _errorMessage = _getLocalizedString('noEncryptedImageToShare');
+      notifyListeners();
+      return;
+    }
+
+    try {
+      await Share.shareXFiles(
+        [XFile(selectedImageToEncode!.path)],
+        text: _getLocalizedString('encryptedImage'),
+      );
+      _errorMessage = null;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
+    }
+  }
+
+  Future<void> shareDecodedImage() async {
+    if (selectedImageToDecode == null) {
+      _errorMessage = _getLocalizedString('noDecryptedImageToShare');
+      notifyListeners();
+      return;
+    }
+
+    try {
+      await Share.shareXFiles(
+        [XFile(selectedImageToDecode!.path)],
+        text: _getLocalizedString('decryptedImage'),
+      );
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');

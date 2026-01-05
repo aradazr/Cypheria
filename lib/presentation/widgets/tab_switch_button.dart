@@ -61,6 +61,16 @@ class TabSwitchButton extends StatelessWidget {
               primaryColor: primaryColor,
             ),
           ),
+          Expanded(
+            child: _buildTab(
+              context,
+              label: localizations.audioEncodingTab,
+              icon: Icons.mic,
+              isActive: currentTab == TabType.audio,
+              onTap: () => onTabChanged(TabType.audio),
+              primaryColor: primaryColor,
+            ),
+          ),
         ],
       ),
     );
@@ -107,7 +117,7 @@ class TabSwitchButton extends StatelessWidget {
                     : Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6),
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
                 fontSize: Responsive.fontSize(context, 12, 14, 16),
-                fontFamily: 'PelakFA',
+                fontFamily: Responsive.getFontFamily(context),
               ),
             ),
           ],

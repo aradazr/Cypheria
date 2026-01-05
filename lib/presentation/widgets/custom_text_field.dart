@@ -14,6 +14,8 @@ class CustomTextField extends StatefulWidget {
   final VoidCallback? onSubmitted;
   final String? errorText;
   final bool readOnly;
+  final VoidCallback? onMicrophoneTap;
+  final bool isListening;
 
   const CustomTextField({
     super.key,
@@ -27,6 +29,8 @@ class CustomTextField extends StatefulWidget {
     this.onSubmitted,
     this.errorText,
     this.readOnly = false,
+    this.onMicrophoneTap,
+    this.isListening = false,
   });
 
   @override
@@ -68,7 +72,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             color: Theme.of(context).textTheme.bodyLarge?.color,
             fontWeight: FontWeight.w500,
             fontSize: Responsive.fontSize(context, 14, 16, 18),
-            fontFamily: 'PelakFA',
+            fontFamily: Responsive.getFontFamily(context),
           ),
         ),
         SizedBox(height: Responsive.spacing(context, 6, 8, 10)),
@@ -96,7 +100,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           style: TextStyle(
             color: Theme.of(context).textTheme.bodyLarge?.color,
             fontSize: Responsive.fontSize(context, 14, 16, 18),
-            fontFamily: 'PelakFA',
+            fontFamily: Responsive.getFontFamily(context),
           ),
           textDirection: Localizations.localeOf(context).languageCode == 'fa'
               ? TextDirection.rtl
@@ -112,7 +116,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             hintStyle: TextStyle(
               color: Colors.grey.shade600,
               fontSize: Responsive.fontSize(context, 14, 16, 18),
-              fontFamily: 'PelakFA',
+              fontFamily: Responsive.getFontFamily(context),
             ),
             errorText: widget.errorText,
             contentPadding: Responsive.padding(
@@ -120,28 +124,65 @@ class _CustomTextFieldState extends State<CustomTextField> {
               horizontal: 16,
               vertical: Responsive.spacing(context, 14, 16, 18),
             ),
-            suffixIcon: _controller.text.isNotEmpty
-                ? IconButton(
-                    icon: Icon(
-                      Icons.copy,
-                      color: Colors.grey,
-                      size: Responsive.iconSize(context, 20, 22, 24),
-                    ),
-                    onPressed: () {
-                      Clipboard.setData(ClipboardData(text: _controller.text));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(localizations?.copied ?? 'Copied'),
-                          duration: const Duration(seconds: 1),
-                        ),
-                      );
-                    },
-                    tooltip: localizations?.copied ?? 'Copy',
-                  )
-                : null,
+            suffixIcon: _buildSuffixIcon(context, localizations),
           ),
         ),
       ],
+    );
+  }
+
+  Widget? _buildSuffixIcon(BuildContext context, AppLocalizations? localizations) {
+    final List<Widget> actions = [];
+
+    // Add microphone button if callback is provided
+    if (widget.onMicrophoneTap != null) {
+      actions.add(
+        IconButton(
+          icon: Icon(
+            widget.isListening ? Icons.mic : Icons.mic_none,
+            color: widget.isListening 
+                ? Theme.of(context).colorScheme.error 
+                : Theme.of(context).colorScheme.primary,
+            size: Responsive.iconSize(context, 20, 22, 24),
+          ),
+          onPressed: widget.onMicrophoneTap,
+          tooltip: widget.isListening 
+              ? (localizations?.stopListening ?? 'Stop Listening')
+              : (localizations?.startListening ?? 'Start Listening'),
+        ),
+      );
+    }
+
+    // Add copy button if text is not empty
+    if (_controller.text.isNotEmpty) {
+      actions.add(
+        IconButton(
+          icon: Icon(
+            Icons.copy,
+            color: Colors.grey,
+            size: Responsive.iconSize(context, 20, 22, 24),
+          ),
+          onPressed: () {
+            Clipboard.setData(ClipboardData(text: _controller.text));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(localizations?.copied ?? 'Copied'),
+                duration: const Duration(seconds: 1),
+              ),
+            );
+          },
+          tooltip: localizations?.copied ?? 'Copy',
+        ),
+      );
+    }
+
+    if (actions.isEmpty) return null;
+    if (actions.length == 1) return actions[0];
+
+    // If both buttons exist, wrap them in a Row
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: actions,
     );
   }
 }

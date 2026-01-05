@@ -17,14 +17,16 @@ class ImageEncoderLayout extends StatelessWidget {
 
     return Consumer<ImageEncoderProvider>(
       builder: (context, provider, child) {
+        // Update locale in provider
+        provider.setLocale(Localizations.localeOf(context));
         final isEncoding = provider.isEncoding;
 
         // For encoding: use original image for display, not encrypted file
         // For decoding: use decoded image (which is a valid PNG)
         final displayImage = isEncoding
             ? (provider.isEncoded
-                ? provider.originalImageToEncode
-                : provider.selectedImageToEncode)
+                  ? provider.originalImageToEncode
+                  : provider.selectedImageToEncode)
             : provider.selectedImageToDecode;
 
         final isLoading = isEncoding
@@ -54,7 +56,7 @@ class ImageEncoderLayout extends StatelessWidget {
                   color: Theme.of(context).textTheme.bodyLarge?.color,
                   fontWeight: FontWeight.w500,
                   fontSize: Responsive.fontSize(context, 14, 16, 18),
-                  fontFamily: 'PelakFA',
+                  fontFamily: Responsive.getFontFamily(context),
                 ),
               ),
             ),
@@ -67,7 +69,7 @@ class ImageEncoderLayout extends StatelessWidget {
               style: TextStyle(
                 color: Theme.of(context).textTheme.bodyLarge?.color,
                 fontSize: Responsive.fontSize(context, 14, 16, 18),
-                fontFamily: 'PelakFA',
+                fontFamily: Responsive.getFontFamily(context),
               ),
               textDirection:
                   Localizations.localeOf(context).languageCode == 'fa'
@@ -79,7 +81,7 @@ class ImageEncoderLayout extends StatelessWidget {
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontSize: Responsive.fontSize(context, 14, 16, 18),
-                    fontFamily: 'PelakFA',
+                    fontFamily: Responsive.getFontFamily(context),
                   ),
                 ),
                 errorText: provider.errorMessage,
@@ -122,10 +124,12 @@ class ImageEncoderLayout extends StatelessWidget {
                   : () {
                       if (isEncoding) {
                         // Use original image if encoded, otherwise use selected image
-                        final fileToEncode = provider.isEncoded && provider.originalImageToEncode != null
+                        final fileToEncode =
+                            provider.isEncoded &&
+                                provider.originalImageToEncode != null
                             ? provider.originalImageToEncode!
                             : provider.selectedImageToEncode;
-                        
+
                         if (fileToEncode == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -142,10 +146,12 @@ class ImageEncoderLayout extends StatelessWidget {
                         );
                       } else {
                         // Use encrypted file if decoded, otherwise use selected image
-                        final fileToDecode = provider.isDecoded && provider.originalImageToDecode != null
+                        final fileToDecode =
+                            provider.isDecoded &&
+                                provider.originalImageToDecode != null
                             ? provider.originalImageToDecode!
                             : provider.selectedImageToDecode;
-                        
+
                         if (fileToDecode == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -167,25 +173,51 @@ class ImageEncoderLayout extends StatelessWidget {
             SizedBox(height: Responsive.spacing(context, 10, 12, 14)),
 
             if (isDone)
-              _saveButton(
-                context: context,
-                text: localizations.saveToGallery,
-                onPressed: () async {
-                  if (isEncoding) {
-                    await provider.saveEncodedImage();
-                  } else {
-                    await provider.saveDecodedImage();
-                  }
+              Column(
+                children: [
+                  _saveButton(
+                    context: context,
+                    text: localizations.saveToGallery,
+                    onPressed: () async {
+                      if (isEncoding) {
+                        await provider.saveEncodedImage();
+                      } else {
+                        await provider.saveDecodedImage();
+                      }
 
-                  if (provider.errorMessage == null && context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(localizations.savedToGallery),
-                        duration: const Duration(seconds: 1),
-                      ),
-                    );
-                  }
-                },
+                      if (provider.errorMessage == null && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(localizations.savedToGallery),
+                            duration: const Duration(seconds: 1),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  SizedBox(height: Responsive.spacing(context, 10, 12, 14)),
+                  _shareButton(
+                    context: context,
+                    text: localizations.share,
+                    onPressed: () async {
+                      if (isEncoding) {
+                        await provider.shareEncodedImage();
+                      } else {
+                        await provider.shareDecodedImage();
+                      }
+
+                      if (provider.errorMessage != null && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(provider.errorMessage!),
+                            duration: const Duration(seconds: 3),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ],
               ),
           ],
         );
@@ -206,7 +238,7 @@ class ImageEncoderLayout extends StatelessWidget {
     bool isEncoded = false,
   }) {
     final localizations = AppLocalizations.of(context)!;
-    
+
     return Container(
       height: Responsive.height(context, 350),
       decoration: BoxDecoration(
@@ -240,7 +272,7 @@ class ImageEncoderLayout extends StatelessWidget {
                         hintText,
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontSize: Responsive.fontSize(context, 14, 16, 18),
-                          fontFamily: 'PelakFA',
+                          fontFamily: Responsive.getFontFamily(context),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -267,36 +299,68 @@ class ImageEncoderLayout extends StatelessWidget {
                           ),
                           child: Center(
                             child: Padding(
-                              padding: Responsive.padding(context, horizontal: 16),
+                              padding: Responsive.padding(
+                                context,
+                                horizontal: 16,
+                              ),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     Icons.lock,
-                                    size: Responsive.fontSize(context, 80, 100, 120),
-                                    color: Theme.of(context).colorScheme.primary,
+                                    size: Responsive.fontSize(
+                                      context,
+                                      80,
+                                      100,
+                                      120,
+                                    ),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
                                   ),
                                   SizedBox(
-                                    height: Responsive.spacing(context, 16, 20, 24),
+                                    height: Responsive.spacing(
+                                      context,
+                                      16,
+                                      20,
+                                      24,
+                                    ),
                                   ),
                                   Text(
                                     localizations.encryptedFileSelected,
-                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      fontSize: Responsive.fontSize(context, 14, 16, 18),
-                                      fontFamily: 'PelakFA',
-                                    ),
+                                    style: Theme.of(context).textTheme.bodyLarge
+                                        ?.copyWith(
+                                          fontSize: Responsive.fontSize(
+                                            context,
+                                            14,
+                                            16,
+                                            18,
+                                          ),
+                                          fontFamily: Responsive.getFontFamily(context),
+                                        ),
                                     textAlign: TextAlign.center,
                                   ),
                                   SizedBox(
-                                    height: Responsive.spacing(context, 8, 10, 12),
+                                    height: Responsive.spacing(
+                                      context,
+                                      8,
+                                      10,
+                                      12,
+                                    ),
                                   ),
                                   Text(
                                     localizations.decryptToView,
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Colors.grey,
-                                      fontSize: Responsive.fontSize(context, 12, 14, 16),
-                                      fontFamily: 'PelakFA',
-                                    ),
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: Colors.grey,
+                                          fontSize: Responsive.fontSize(
+                                            context,
+                                            12,
+                                            14,
+                                            16,
+                                          ),
+                                          fontFamily: Responsive.getFontFamily(context),
+                                        ),
                                     textAlign: TextAlign.center,
                                   ),
                                 ],
@@ -317,15 +381,25 @@ class ImageEncoderLayout extends StatelessWidget {
                             vertical: Responsive.spacing(context, 6, 8, 10),
                           ),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.9),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.9),
                             borderRadius: BorderRadius.circular(
                               Responsive.borderRadius(context, 20, 24, 28),
                             ),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.3),
-                                blurRadius: Responsive.spacing(context, 8, 10, 12),
-                                offset: Offset(0, Responsive.spacing(context, 2, 2, 3)),
+                                blurRadius: Responsive.spacing(
+                                  context,
+                                  8,
+                                  10,
+                                  12,
+                                ),
+                                offset: Offset(
+                                  0,
+                                  Responsive.spacing(context, 2, 2, 3),
+                                ),
                               ),
                             ],
                           ),
@@ -337,14 +411,21 @@ class ImageEncoderLayout extends StatelessWidget {
                                 size: Responsive.iconSize(context, 16, 18, 20),
                                 color: Colors.white,
                               ),
-                              SizedBox(width: Responsive.spacing(context, 4, 5, 6)),
+                              SizedBox(
+                                width: Responsive.spacing(context, 4, 5, 6),
+                              ),
                               Text(
                                 localizations.encrypted,
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: Responsive.fontSize(context, 12, 14, 16),
+                                  fontSize: Responsive.fontSize(
+                                    context,
+                                    12,
+                                    14,
+                                    16,
+                                  ),
                                   fontWeight: FontWeight.w600,
-                                  fontFamily: 'PelakFA',
+                                  fontFamily: Responsive.getFontFamily(context),
                                 ),
                               ),
                             ],
@@ -420,7 +501,7 @@ class ImageEncoderLayout extends StatelessWidget {
                     style: TextStyle(
                       fontSize: Responsive.fontSize(context, 16, 18, 20),
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'PelakFA',
+                      fontFamily: Responsive.getFontFamily(context),
                     ),
                   ),
                 ],
@@ -438,15 +519,46 @@ class ImageEncoderLayout extends StatelessWidget {
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: onPressed,
-        icon: Icon(
-          Icons.save,
-          size: Responsive.iconSize(context, 20, 22, 24),
-        ),
+        icon: Icon(Icons.save, size: Responsive.iconSize(context, 20, 22, 24)),
         label: Text(
           text,
           style: TextStyle(
             fontSize: Responsive.fontSize(context, 14, 16, 18),
-            fontFamily: 'PelakFA',
+            fontFamily: Responsive.getFontFamily(context),
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Theme.of(context).textTheme.bodyLarge?.color,
+          side: BorderSide(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey.shade800
+                : Colors.grey.shade300,
+            width: Responsive.spacing(context, 1, 1.5, 2) / 10,
+          ),
+          padding: EdgeInsets.symmetric(
+            vertical: Responsive.spacing(context, 10, 12, 14),
+            horizontal: Responsive.spacing(context, 12, 16, 20),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _shareButton({
+    required BuildContext context,
+    required String text,
+    required VoidCallback onPressed,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(Icons.share, size: Responsive.iconSize(context, 20, 22, 24)),
+        label: Text(
+          text,
+          style: TextStyle(
+            fontSize: Responsive.fontSize(context, 14, 16, 18),
+            fontFamily: Responsive.getFontFamily(context),
           ),
         ),
         style: OutlinedButton.styleFrom(

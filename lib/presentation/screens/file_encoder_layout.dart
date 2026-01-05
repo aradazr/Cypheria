@@ -15,6 +15,8 @@ class FileEncoderLayout extends StatelessWidget {
 
     return Consumer<FileEncoderProvider>(
       builder: (context, provider, child) {
+        // Update locale in provider
+        provider.setLocale(Localizations.localeOf(context));
         final isEncoding = provider.isEncoding;
         final isLoading = isEncoding
             ? provider.isLoadingEncode
@@ -42,7 +44,7 @@ class FileEncoderLayout extends StatelessWidget {
                   color: Theme.of(context).textTheme.bodyLarge?.color,
                   fontWeight: FontWeight.w500,
                   fontSize: Responsive.fontSize(context, 14, 16, 18),
-                  fontFamily: 'PelakFA',
+                  fontFamily: Responsive.getFontFamily(context),
                 ),
               ),
             ),
@@ -55,7 +57,7 @@ class FileEncoderLayout extends StatelessWidget {
               style: TextStyle(
                 color: Theme.of(context).textTheme.bodyLarge?.color,
                 fontSize: Responsive.fontSize(context, 14, 16, 18),
-                fontFamily: 'PelakFA',
+                fontFamily: Responsive.getFontFamily(context),
               ),
               textDirection:
                   Localizations.localeOf(context).languageCode == 'fa'
@@ -67,7 +69,7 @@ class FileEncoderLayout extends StatelessWidget {
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontSize: Responsive.fontSize(context, 14, 16, 18),
-                    fontFamily: 'PelakFA',
+                    fontFamily: Responsive.getFontFamily(context),
                   ),
                 ),
                 errorText: provider.errorMessage,
@@ -178,38 +180,64 @@ class FileEncoderLayout extends StatelessWidget {
             SizedBox(height: Responsive.spacing(context, 10, 12, 14)),
 
             if (isDone)
-              _saveButton(
-                context: context,
-                text: localizations.saveFile,
-                onPressed: () async {
-                  if (isEncoding) {
-                    await provider.saveEncodedFile(
-                      localizations.saveEncryptedFileDialog,
-                    );
-                  } else {
-                    await provider.saveDecodedFile(
-                      localizations.saveDecryptedFileDialog,
-                    );
-                  }
+              Column(
+                children: [
+                  _saveButton(
+                    context: context,
+                    text: localizations.saveFile,
+                    onPressed: () async {
+                      if (isEncoding) {
+                        await provider.saveEncodedFile(
+                          localizations.saveEncryptedFileDialog,
+                        );
+                      } else {
+                        await provider.saveDecodedFile(
+                          localizations.saveDecryptedFileDialog,
+                        );
+                      }
 
-                  // Show error message if save failed
-                  if (provider.errorMessage != null && context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(provider.errorMessage!),
-                        duration: const Duration(seconds: 3),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  } else if (provider.errorMessage == null && context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(localizations.savedFile),
-                        duration: const Duration(seconds: 1),
-                      ),
-                    );
-                  }
-                },
+                      // Show error message if save failed
+                      if (provider.errorMessage != null && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(provider.errorMessage!),
+                            duration: const Duration(seconds: 3),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      } else if (provider.errorMessage == null && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(localizations.savedFile),
+                            duration: const Duration(seconds: 1),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  SizedBox(height: Responsive.spacing(context, 10, 12, 14)),
+                  _shareButton(
+                    context: context,
+                    text: localizations.share,
+                    onPressed: () async {
+                      if (isEncoding) {
+                        await provider.shareEncodedFile();
+                      } else {
+                        await provider.shareDecodedFile();
+                      }
+
+                      if (provider.errorMessage != null && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(provider.errorMessage!),
+                            duration: const Duration(seconds: 3),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ],
               ),
           ],
         );
@@ -265,7 +293,7 @@ class FileEncoderLayout extends StatelessWidget {
                         hintText,
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontSize: Responsive.fontSize(context, 14, 16, 18),
-                          fontFamily: 'PelakFA',
+                          fontFamily: Responsive.getFontFamily(context),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -304,7 +332,7 @@ class FileEncoderLayout extends StatelessWidget {
                                       16,
                                       18,
                                     ),
-                                    fontFamily: 'PelakFA',
+                                    fontFamily: Responsive.getFontFamily(context),
                                   ),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
@@ -351,7 +379,7 @@ class FileEncoderLayout extends StatelessWidget {
                                     16,
                                   ),
                                   fontWeight: FontWeight.w600,
-                                  fontFamily: 'PelakFA',
+                                  fontFamily: Responsive.getFontFamily(context),
                                 ),
                               ),
                             ],
@@ -427,7 +455,7 @@ class FileEncoderLayout extends StatelessWidget {
                     style: TextStyle(
                       fontSize: Responsive.fontSize(context, 16, 18, 20),
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'PelakFA',
+                      fontFamily: Responsive.getFontFamily(context),
                     ),
                   ),
                 ],
@@ -450,7 +478,41 @@ class FileEncoderLayout extends StatelessWidget {
           text,
           style: TextStyle(
             fontSize: Responsive.fontSize(context, 14, 16, 18),
-            fontFamily: 'PelakFA',
+            fontFamily: Responsive.getFontFamily(context),
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Theme.of(context).textTheme.bodyLarge?.color,
+          side: BorderSide(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey.shade800
+                : Colors.grey.shade300,
+            width: Responsive.spacing(context, 1, 1.5, 2) / 10,
+          ),
+          padding: EdgeInsets.symmetric(
+            vertical: Responsive.spacing(context, 10, 12, 14),
+            horizontal: Responsive.spacing(context, 12, 16, 20),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _shareButton({
+    required BuildContext context,
+    required String text,
+    required VoidCallback onPressed,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(Icons.share, size: Responsive.iconSize(context, 20, 22, 24)),
+        label: Text(
+          text,
+          style: TextStyle(
+            fontSize: Responsive.fontSize(context, 14, 16, 18),
+            fontFamily: Responsive.getFontFamily(context),
           ),
         ),
         style: OutlinedButton.styleFrom(

@@ -6,6 +6,8 @@ import '../providers/language_provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/onboarding_provider.dart';
 import '../widgets/app_wrapper.dart';
+import '../screens/privacy_policy_screen.dart';
+import '../screens/terms_of_service_screen.dart';
 
 class SettingsBar extends StatelessWidget {
   const SettingsBar({super.key});
@@ -30,59 +32,114 @@ class SettingsBar extends StatelessWidget {
           ),
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Language Toggle Button
-          Consumer<LanguageProvider>(
-            builder: (context, languageProvider, child) {
-              return IconButton(
-                onPressed: languageProvider.toggleLanguage,
-                icon: const Icon(Icons.language),
-                tooltip: languageProvider.isPersian
-                    ? 'Switch to English'
-                    : 'تغییر به فارسی',
-                iconSize: Responsive.iconSize(context, 22, 24, 26),
-              );
-            },
-          ),
-          SizedBox(width: Responsive.spacing(context, 6, 8, 10)),
-          // Theme Toggle Button
-          Consumer<ThemeProvider>(
-            builder: (context, themeProvider, child) {
-              return IconButton(
-                onPressed: themeProvider.toggleTheme,
-                icon: Icon(
-                  themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                ),
-                tooltip: themeProvider.isDarkMode
-                    ? 'Switch to Light Mode'
-                    : 'تغییر به تم دارک',
-                iconSize: Responsive.iconSize(context, 22, 24, 26),
-              );
-            },
-          ),
-          SizedBox(width: Responsive.spacing(context, 6, 8, 10)),
-          // Help/Onboarding Button
-          Consumer<OnboardingProvider>(
-            builder: (context, onboardingProvider, child) {
-              return IconButton(
-                onPressed: () {
-                  // Reset onboarding
-                  onboardingProvider.resetOnboarding();
-                  
-                  // Reset will trigger rebuild and show onboarding
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (_) => const AppWrapper(),
-                    ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Language Toggle Button
+              Consumer<LanguageProvider>(
+                builder: (context, languageProvider, child) {
+                  return IconButton(
+                    onPressed: languageProvider.toggleLanguage,
+                    icon: const Icon(Icons.language),
+                    tooltip: languageProvider.isPersian
+                        ? 'Switch to English'
+                        : 'تغییر به فارسی',
+                    iconSize: Responsive.iconSize(context, 22, 24, 26),
                   );
                 },
-                icon: const Icon(Icons.help_outline),
-                tooltip: localizations?.skip ?? 'Show Help',
-                iconSize: Responsive.iconSize(context, 22, 24, 26),
-              );
-            },
+              ),
+              SizedBox(width: Responsive.spacing(context, 6, 8, 10)),
+              // Theme Toggle Button
+              Consumer<ThemeProvider>(
+                builder: (context, themeProvider, child) {
+                  return IconButton(
+                    onPressed: themeProvider.toggleTheme,
+                    icon: Icon(
+                      themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                    ),
+                    tooltip: themeProvider.isDarkMode
+                        ? 'Switch to Light Mode'
+                        : 'تغییر به تم دارک',
+                    iconSize: Responsive.iconSize(context, 22, 24, 26),
+                  );
+                },
+              ),
+              SizedBox(width: Responsive.spacing(context, 6, 8, 10)),
+              // Help/Onboarding Button
+              Consumer<OnboardingProvider>(
+                builder: (context, onboardingProvider, child) {
+                  return IconButton(
+                    onPressed: () {
+                      // Reset onboarding
+                      onboardingProvider.resetOnboarding();
+                      
+                      // Reset will trigger rebuild and show onboarding
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (_) => const AppWrapper(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.help_outline),
+                    tooltip: localizations?.skip ?? 'Show Help',
+                    iconSize: Responsive.iconSize(context, 22, 24, 26),
+                  );
+                },
+              ),
+            ],
+          ),
+          // Privacy Policy and Terms of Service row
+          Padding(
+            padding: EdgeInsets.only(
+              top: Responsive.spacing(context, 4, 6, 8),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const PrivacyPolicyScreen(),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    localizations?.privacyPolicy ?? 'Privacy Policy',
+                    style: TextStyle(
+                      fontSize: Responsive.fontSize(context, 11, 12, 13),
+                      fontFamily: Responsive.getFontFamily(context),
+                    ),
+                  ),
+                ),
+                Text(
+                  ' | ',
+                  style: TextStyle(
+                    fontSize: Responsive.fontSize(context, 11, 12, 13),
+                    color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.5),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const TermsOfServiceScreen(),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    localizations?.termsOfService ?? 'Terms of Service',
+                    style: TextStyle(
+                      fontSize: Responsive.fontSize(context, 11, 12, 13),
+                      fontFamily: Responsive.getFontFamily(context),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

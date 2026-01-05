@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static ThemeData get darkTheme {
+  static ThemeData darkTheme([Locale? locale]) {
+    final fontFamily = locale?.languageCode == 'fa' ? 'PelakFA' : null;
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
@@ -17,16 +18,16 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: const Color(0xFF121212),
       cardColor: const Color(0xFF1E1E2E),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF1E1E2E),
+      appBarTheme: AppBarTheme(
+        backgroundColor: const Color(0xFF1E1E2E),
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         titleTextStyle: TextStyle(
           color: Colors.white,
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          fontFamily: 'PelakFA',
+          fontFamily: fontFamily,
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -63,25 +64,25 @@ class AppTheme {
             borderRadius: BorderRadius.circular(12),
           ),
           elevation: 0,
-          textStyle: const TextStyle(fontFamily: 'PelakFA'),
+          textStyle: TextStyle(fontFamily: fontFamily),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: const Color(0xFF6366F1),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          textStyle: const TextStyle(fontFamily: 'PelakFA'),
+          textStyle: TextStyle(fontFamily: fontFamily),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          textStyle: const TextStyle(fontFamily: 'PelakFA'),
+          textStyle: TextStyle(fontFamily: fontFamily),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: const Color(0xFF1E1E2E),
-        contentTextStyle: const TextStyle(
-          fontFamily: 'PelakFA',
+        contentTextStyle: TextStyle(
+          fontFamily: fontFamily,
           color: Colors.white,
           fontSize: 14,
         ),
@@ -90,29 +91,30 @@ class AppTheme {
         ),
         behavior: SnackBarBehavior.floating,
       ),
-      fontFamily: 'PelakFA',
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(color: Colors.white, fontFamily: 'PelakFA'),
-        displayMedium: TextStyle(color: Colors.white, fontFamily: 'PelakFA'),
-        displaySmall: TextStyle(color: Colors.white, fontFamily: 'PelakFA'),
-        headlineLarge: TextStyle(color: Colors.white, fontFamily: 'PelakFA'),
-        headlineMedium: TextStyle(color: Colors.white, fontFamily: 'PelakFA'),
-        headlineSmall: TextStyle(color: Colors.white, fontFamily: 'PelakFA'),
+      fontFamily: fontFamily,
+      textTheme: TextTheme(
+        displayLarge: TextStyle(color: Colors.white, fontFamily: fontFamily),
+        displayMedium: TextStyle(color: Colors.white, fontFamily: fontFamily),
+        displaySmall: TextStyle(color: Colors.white, fontFamily: fontFamily),
+        headlineLarge: TextStyle(color: Colors.white, fontFamily: fontFamily),
+        headlineMedium: TextStyle(color: Colors.white, fontFamily: fontFamily),
+        headlineSmall: TextStyle(color: Colors.white, fontFamily: fontFamily),
         titleLarge: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w600,
-          fontFamily: 'PelakFA',
+          fontFamily: fontFamily,
         ),
-        titleMedium: TextStyle(color: Colors.white, fontFamily: 'PelakFA'),
-        titleSmall: TextStyle(color: Colors.white, fontFamily: 'PelakFA'),
-        bodyLarge: TextStyle(color: Colors.white70, fontFamily: 'PelakFA'),
-        bodyMedium: TextStyle(color: Colors.white70, fontFamily: 'PelakFA'),
-        bodySmall: TextStyle(color: Colors.white60, fontFamily: 'PelakFA'),
+        titleMedium: TextStyle(color: Colors.white, fontFamily: fontFamily),
+        titleSmall: TextStyle(color: Colors.white, fontFamily: fontFamily),
+        bodyLarge: TextStyle(color: Colors.white70, fontFamily: fontFamily),
+        bodyMedium: TextStyle(color: Colors.white70, fontFamily: fontFamily),
+        bodySmall: TextStyle(color: Colors.white60, fontFamily: fontFamily),
       ),
     );
   }
 
-  static ThemeData get lightTheme {
+  static ThemeData lightTheme([Locale? locale]) {
+    final fontFamily = locale?.languageCode == 'fa' ? 'PelakFA' : null;
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
@@ -128,16 +130,16 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: Colors.white,
       cardColor: const Color(0xFFF5F5F5),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: Colors.black87),
+        iconTheme: const IconThemeData(color: Colors.black87),
         titleTextStyle: TextStyle(
           color: Colors.black87,
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          fontFamily: 'PelakFA',
+          fontFamily: fontFamily,
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -174,26 +176,26 @@ class AppTheme {
             borderRadius: BorderRadius.circular(12),
           ),
           elevation: 0,
-          textStyle: const TextStyle(fontFamily: 'PelakFA'),
+          textStyle: TextStyle(fontFamily: fontFamily),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: const Color(0xFF6366F1),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          textStyle: const TextStyle(fontFamily: 'PelakFA'),
+          textStyle: TextStyle(fontFamily: fontFamily),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          textStyle: const TextStyle(fontFamily: 'PelakFA'),
+          textStyle: TextStyle(fontFamily: fontFamily),
           side: BorderSide(color: Colors.grey.shade300),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: const Color(0xFF323232),
-        contentTextStyle: const TextStyle(
-          fontFamily: 'PelakFA',
+        contentTextStyle: TextStyle(
+          fontFamily: fontFamily,
           color: Colors.white,
           fontSize: 14,
         ),
@@ -202,24 +204,24 @@ class AppTheme {
         ),
         behavior: SnackBarBehavior.floating,
       ),
-      fontFamily: 'PelakFA',
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(color: Colors.black87, fontFamily: 'PelakFA'),
-        displayMedium: TextStyle(color: Colors.black87, fontFamily: 'PelakFA'),
-        displaySmall: TextStyle(color: Colors.black87, fontFamily: 'PelakFA'),
-        headlineLarge: TextStyle(color: Colors.black87, fontFamily: 'PelakFA'),
-        headlineMedium: TextStyle(color: Colors.black87, fontFamily: 'PelakFA'),
-        headlineSmall: TextStyle(color: Colors.black87, fontFamily: 'PelakFA'),
+      fontFamily: fontFamily,
+      textTheme: TextTheme(
+        displayLarge: TextStyle(color: Colors.black87, fontFamily: fontFamily),
+        displayMedium: TextStyle(color: Colors.black87, fontFamily: fontFamily),
+        displaySmall: TextStyle(color: Colors.black87, fontFamily: fontFamily),
+        headlineLarge: TextStyle(color: Colors.black87, fontFamily: fontFamily),
+        headlineMedium: TextStyle(color: Colors.black87, fontFamily: fontFamily),
+        headlineSmall: TextStyle(color: Colors.black87, fontFamily: fontFamily),
         titleLarge: TextStyle(
           color: Colors.black87,
           fontWeight: FontWeight.w600,
-          fontFamily: 'PelakFA',
+          fontFamily: fontFamily,
         ),
-        titleMedium: TextStyle(color: Colors.black87, fontFamily: 'PelakFA'),
-        titleSmall: TextStyle(color: Colors.black87, fontFamily: 'PelakFA'),
-        bodyLarge: TextStyle(color: Colors.black54, fontFamily: 'PelakFA'),
-        bodyMedium: TextStyle(color: Colors.black54, fontFamily: 'PelakFA'),
-        bodySmall: TextStyle(color: Colors.black45, fontFamily: 'PelakFA'),
+        titleMedium: TextStyle(color: Colors.black87, fontFamily: fontFamily),
+        titleSmall: TextStyle(color: Colors.black87, fontFamily: fontFamily),
+        bodyLarge: TextStyle(color: Colors.black54, fontFamily: fontFamily),
+        bodyMedium: TextStyle(color: Colors.black54, fontFamily: fontFamily),
+        bodySmall: TextStyle(color: Colors.black45, fontFamily: fontFamily),
       ),
     );
   }

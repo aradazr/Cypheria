@@ -7,8 +7,27 @@ import '../providers/text_encoder_provider.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/mode_switch_button.dart';
 
-class TextEncoderLayout extends StatelessWidget {
+class TextEncoderLayout extends StatefulWidget {
   const TextEncoderLayout({super.key});
+
+  @override
+  State<TextEncoderLayout> createState() => _TextEncoderLayoutState();
+}
+
+class _TextEncoderLayoutState extends State<TextEncoderLayout> {
+  bool _speechInitialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_speechInitialized) {
+      final locale = Localizations.localeOf(context);
+      final provider = Provider.of<TextEncoderProvider>(context, listen: false);
+      provider.setLocale(locale);
+      provider.initializeSpeech();
+      _speechInitialized = true;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,15 +60,19 @@ class TextEncoderLayout extends StatelessWidget {
               label: provider.isEncoding
                   ? localizations.originalText
                   : localizations.encryptedText,
-              hint: provider.isEncoding
-                  ? localizations.enterText
-                  : localizations.enterEncryptedText,
+              hint: provider.isListening
+                  ? localizations.listening
+                  : (provider.isEncoding
+                      ? localizations.enterText
+                      : localizations.enterEncryptedText),
               value: provider.inputText,
               onChanged: provider.setInputText,
               maxLines: 6,
               textInputAction: TextInputAction.done,
               onSubmitted: () => provider.process(context),
               errorText: provider.errorMessage,
+              onMicrophoneTap: () => provider.startListening(),
+              isListening: provider.isListening,
             ),
             SizedBox(height: Responsive.spacing(context, 20, 24, 28)),
 
@@ -82,7 +105,7 @@ class TextEncoderLayout extends StatelessWidget {
                           style: TextStyle(
                             fontSize: Responsive.fontSize(context, 16, 18, 20),
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'PelakFA',
+                            fontFamily: Responsive.getFontFamily(context),
                           ),
                         ),
                       ],
