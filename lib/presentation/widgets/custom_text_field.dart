@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/utils/responsive.dart';
@@ -134,8 +136,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
   Widget? _buildSuffixIcon(BuildContext context, AppLocalizations? localizations) {
     final List<Widget> actions = [];
 
-    // Add microphone button if callback is provided
-    if (widget.onMicrophoneTap != null) {
+    // Add microphone button if callback is provided and not iOS
+    // Speech to text is disabled on iOS because it doesn't support Persian
+    if (widget.onMicrophoneTap != null && !Platform.isIOS) {
       actions.add(
         IconButton(
           icon: Icon(

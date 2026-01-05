@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../../domain/repositories/text_encoder_repository.dart';
@@ -168,41 +171,128 @@ class TextEncoderProvider extends ChangeNotifier {
   }
 
   Future<void> initializeSpeech() async {
-    _speechAvailable = await _speech.initialize(
-      onStatus: (status) {
-        if (status == 'done' || status == 'notListening') {
+    try {
+      _speechAvailable = await _speech.initialize(
+        onStatus: (status) {
+          debugPrint(
+            'DEBUG [TextEncoderProvider.initializeSpeech]: Status: $status',
+          );
+          if (status == 'done' || status == 'notListening') {
+            _isListening = false;
+            notifyListeners();
+          }
+        },
+        onError: (error) {
+          debugPrint('ERROR [TextEncoderProvider.initializeSpeech]: $error');
           _isListening = false;
+          _errorMessage = _getLocalizedString('speechNotAvailable');
           notifyListeners();
-        }
-      },
-      onError: (error) {
-        _isListening = false;
-        _errorMessage = _getLocalizedString('speechNotAvailable');
-        notifyListeners();
-      },
-    );
-    notifyListeners();
+        },
+      );
+      debugPrint(
+        'DEBUG [TextEncoderProvider.initializeSpeech]: Speech available: $_speechAvailable',
+      );
+      notifyListeners();
+    } catch (e) {
+      debugPrint('ERROR [TextEncoderProvider.initializeSpeech]: Exception: $e');
+      _speechAvailable = false;
+      _errorMessage = _getLocalizedString('speechNotAvailable');
+      notifyListeners();
+    }
   }
 
   Future<void> startListening() async {
-    if (!_speechAvailable) {
-      await initializeSpeech();
-    }
+    debugPrint('DEBUG [TextEncoderProvider.startListening]: Starting...');
+
+    // Always re-initialize to ensure permissions are checked
+    debugPrint(
+      'DEBUG [TextEncoderProvider.startListening]: Re-initializing speech...',
+    );
+    await initializeSpeech();
 
     if (!_speechAvailable) {
+      debugPrint(
+        'ERROR [TextEncoderProvider.startListening]: Speech not available after initialization',
+      );
       _errorMessage = _getLocalizedString('speechNotAvailable');
       notifyListeners();
       return;
     }
 
     if (_isListening) {
+      debugPrint(
+        'DEBUG [TextEncoderProvider.startListening]: Already listening, stopping...',
+      );
       await stopListening();
       return;
     }
 
     try {
+      debugPrint(
+        'DEBUG [TextEncoderProvider.startListening]: Starting speech recognition...',
+      );
+
+      // Get available locales
+      final locales = await _speech.locales();
+      debugPrint(
+        'DEBUG [TextEncoderProvider.startListening]: Available locales: ${locales.map((l) => l.localeId).toList()}',
+      );
+
+      // Determine which locale to use
+      // Android supports Persian (fa_IR), but iOS doesn't
+      String preferredLocaleId;
+      if (_locale.languageCode == 'fa') {
+        if (Platform.isAndroid) {
+          // Android supports Persian
+          preferredLocaleId = 'fa_IR';
+          debugPrint(
+            'DEBUG [TextEncoderProvider.startListening]: Android detected, using Persian (fa_IR)',
+          );
+        } else {
+          // iOS doesn't support Persian, use English as fallback
+          preferredLocaleId = 'en_US';
+          debugPrint(
+            'DEBUG [TextEncoderProvider.startListening]: iOS detected, Persian not supported, using English fallback',
+          );
+        }
+      } else {
+        preferredLocaleId = 'en_US';
+      }
+
+      // Check if preferred locale is available, if not use fallback
+      var availableLocale = locales.firstWhere(
+        (locale) => locale.localeId == preferredLocaleId,
+        orElse: () {
+          // Preferred locale not available, use fallback
+          debugPrint(
+            'DEBUG [TextEncoderProvider.startListening]: Preferred locale ($preferredLocaleId) not available, using fallback',
+          );
+          if (preferredLocaleId == 'fa_IR') {
+            // If Persian was requested but not available, try English
+            return locales.firstWhere(
+              (locale) => locale.localeId == 'en_US',
+              orElse: () => locales.first,
+            );
+          } else {
+            // Use first available locale
+            return locales.first;
+          }
+        },
+      );
+
+      debugPrint(
+        'DEBUG [TextEncoderProvider.startListening]: Using locale: ${availableLocale.localeId}',
+      );
+
+      debugPrint(
+        'DEBUG [TextEncoderProvider.startListening]: Using locale: ${availableLocale.localeId}',
+      );
+
       await _speech.listen(
         onResult: (result) {
+          debugPrint(
+            'DEBUG [TextEncoderProvider.startListening]: Result: ${result.recognizedWords}, final: ${result.finalResult}',
+          );
           if (result.finalResult) {
             _inputText = result.recognizedWords;
             _isListening = false;
@@ -211,14 +301,31 @@ class TextEncoderProvider extends ChangeNotifier {
           }
           notifyListeners();
         },
-        localeId: _locale.languageCode == 'fa' ? 'fa_IR' : 'en_US',
+        localeId: availableLocale.localeId,
+        listenMode: stt.ListenMode.dictation,
+        pauseFor: const Duration(seconds: 3),
+        cancelOnError: false,
+        partialResults: true,
       );
       _isListening = true;
       _errorMessage = null;
+      debugPrint(
+        'DEBUG [TextEncoderProvider.startListening]: Listening started successfully',
+      );
       notifyListeners();
     } catch (e) {
+      debugPrint('ERROR [TextEncoderProvider.startListening]: Exception: $e');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       _isListening = false;
-      _errorMessage = _getLocalizedString('speechPermissionDenied');
+
+      // Provide more specific error message
+      if (e.toString().contains('ListenFailedException')) {
+        _errorMessage = _locale.languageCode == 'fa'
+            ? 'تشخیص گفتار فارسی در iOS پشتیبانی نمی‌شود. لطفاً از انگلیسی استفاده کنید یا متن را تایپ کنید.'
+            : 'Speech recognition failed. Please check microphone permission and try again.';
+      } else {
+        _errorMessage = _getLocalizedString('speechPermissionDenied');
+      }
       notifyListeners();
     }
   }

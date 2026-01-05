@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
@@ -82,48 +83,117 @@ class AudioEncoderProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _isPermissionPermanentlyDenied = false;
+
+  bool get isPermissionPermanentlyDenied => _isPermissionPermanentlyDenied;
+
+  Future<void> openSettings() async {
+    await openAppSettings();
+  }
+
   Future<bool> _checkMicrophonePermission() async {
-    final status = await Permission.microphone.request();
-    return status.isGranted;
+    _isPermissionPermanentlyDenied = false;
+    
+    // First check with recorder package (more reliable for iOS)
+    final hasRecorderPermission = await _recorder.hasPermission();
+    debugPrint('DEBUG [AudioEncoderProvider._checkMicrophonePermission]: Recorder permission: $hasRecorderPermission');
+    
+    if (hasRecorderPermission) {
+      debugPrint('DEBUG [AudioEncoderProvider._checkMicrophonePermission]: Recorder has permission, allowing');
+      return true;
+    }
+    
+    // If recorder doesn't have permission, check with permission_handler
+    var status = await Permission.microphone.status;
+    debugPrint('DEBUG [AudioEncoderProvider._checkMicrophonePermission]: Permission handler status: $status');
+    
+    if (status.isGranted) {
+      // Permission is granted but recorder says no - this shouldn't happen
+      debugPrint('WARNING [AudioEncoderProvider._checkMicrophonePermission]: Permission granted but recorder says no');
+      return false;
+    }
+    
+    if (status.isPermanentlyDenied) {
+      // Permission is permanently denied, user needs to go to settings
+      _isPermissionPermanentlyDenied = true;
+      debugPrint('ERROR [AudioEncoderProvider._checkMicrophonePermission]: Permission permanently denied');
+      return false;
+    }
+    
+    if (status.isDenied) {
+      // Request permission
+      debugPrint('DEBUG [AudioEncoderProvider._checkMicrophonePermission]: Requesting permission...');
+      status = await Permission.microphone.request();
+      debugPrint('DEBUG [AudioEncoderProvider._checkMicrophonePermission]: After request status: $status');
+      
+      if (status.isPermanentlyDenied) {
+        _isPermissionPermanentlyDenied = true;
+        debugPrint('ERROR [AudioEncoderProvider._checkMicrophonePermission]: Permission permanently denied after request');
+        return false;
+      }
+      
+      if (status.isGranted) {
+        // Check recorder again after permission granted
+        final hasRecorderPermissionAfter = await _recorder.hasPermission();
+        debugPrint('DEBUG [AudioEncoderProvider._checkMicrophonePermission]: Recorder permission after grant: $hasRecorderPermissionAfter');
+        return hasRecorderPermissionAfter;
+      }
+    }
+    
+    return false;
   }
 
   Future<void> startRecording() async {
     try {
       _errorMessage = null;
       
+      // Check permission first
       if (!await _checkMicrophonePermission()) {
-        _errorMessage = _getLocalizedString('errorRecordingAudio');
+        if (_isPermissionPermanentlyDenied) {
+          _errorMessage = _getLocalizedString('errorRecordingAudio') + 
+              ' - ' + (_locale.languageCode == 'fa' 
+                  ? 'لطفاً به تنظیمات بروید و دسترسی میکروفون را فعال کنید'
+                  : 'Please go to Settings and enable microphone access');
+        } else {
+          _errorMessage = _getLocalizedString('errorRecordingAudio');
+        }
+        debugPrint('ERROR [AudioEncoderProvider.startRecording]: Permission denied');
         notifyListeners();
         return;
       }
 
-      if (await _recorder.hasPermission()) {
-        final dir = await getTemporaryDirectory();
-        final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final filePath = '${dir.path}/audio_$timestamp.m4a';
-        
-        await _recorder.start(
-          const RecordConfig(
-            encoder: AudioEncoder.aacLc,
-            bitRate: 128000,
-            sampleRate: 44100,
-          ),
-          path: filePath,
-        );
-        
-        isRecording = true;
-        _recordingDuration = Duration.zero;
-        recordedAudioFile = File(filePath);
-        notifyListeners();
-        
-        // Update duration every second
-        _updateRecordingDuration();
-      } else {
+      // Double check with recorder
+      if (!await _recorder.hasPermission()) {
         _errorMessage = _getLocalizedString('errorRecordingAudio');
+        debugPrint('ERROR [AudioEncoderProvider.startRecording]: Recorder has no permission');
         notifyListeners();
+        return;
       }
+
+      final dir = await getTemporaryDirectory();
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final filePath = '${dir.path}/audio_$timestamp.m4a';
+      
+      await _recorder.start(
+        const RecordConfig(
+          encoder: AudioEncoder.aacLc,
+          bitRate: 128000,
+          sampleRate: 44100,
+        ),
+        path: filePath,
+      );
+      
+      isRecording = true;
+      _recordingDuration = Duration.zero;
+      recordedAudioFile = File(filePath);
+      notifyListeners();
+      
+      // Update duration every second
+      _updateRecordingDuration();
     } catch (e) {
       _errorMessage = '${_getLocalizedString('errorRecordingAudio')}: $e';
+      debugPrint('ERROR [AudioEncoderProvider.startRecording]: Exception: $e');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       notifyListeners();
     }
   }
@@ -154,6 +224,8 @@ class AudioEncoderProvider extends ChangeNotifier {
       }
     } catch (e) {
       _errorMessage = '${_getLocalizedString('errorRecordingAudio')}: $e';
+      debugPrint('ERROR [AudioEncoderProvider.stopRecording]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       notifyListeners();
     }
   }
@@ -173,6 +245,8 @@ class AudioEncoderProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _errorMessage = '${_getLocalizedString('errorPlayingAudio')}: $e';
+      debugPrint('ERROR [AudioEncoderProvider.playAudio]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       isPlaying = false;
       notifyListeners();
     }
@@ -186,6 +260,8 @@ class AudioEncoderProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _errorMessage = '${_getLocalizedString('errorPlayingAudio')}: $e';
+      debugPrint('ERROR [AudioEncoderProvider.stopPlaying]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       notifyListeners();
     }
   }
@@ -208,6 +284,8 @@ class AudioEncoderProvider extends ChangeNotifier {
       }
     } catch (e) {
       _errorMessage = '${_getLocalizedString('errorSelectingFile')}: $e';
+      debugPrint('ERROR [AudioEncoderProvider.pickAudioToDecode]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       notifyListeners();
     }
   }
@@ -260,6 +338,8 @@ class AudioEncoderProvider extends ChangeNotifier {
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('ERROR [AudioEncoderProvider.encodeAudio]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       isEncoded = false;
     } finally {
       isLoadingEncode = false;
@@ -297,6 +377,8 @@ class AudioEncoderProvider extends ChangeNotifier {
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('ERROR [AudioEncoderProvider.decodeAudio]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       isDecoded = false;
     } finally {
       isLoadingDecode = false;
@@ -312,13 +394,30 @@ class AudioEncoderProvider extends ChangeNotifier {
     }
 
     try {
-      await Share.shareXFiles(
-        [XFile(selectedAudioToEncode!.path)],
-        text: _getLocalizedString('encryptedAudio'),
+      final xFile = XFile(
+        selectedAudioToEncode!.path,
+        mimeType: 'application/octet-stream',
       );
+      
+      if (Platform.isIOS) {
+        // iOS requires sharePositionOrigin for iPad
+        await Share.shareXFiles(
+          [xFile],
+          text: _getLocalizedString('encryptedAudio'),
+          sharePositionOrigin: const Rect.fromLTWH(0, 0, 100, 100),
+        );
+      } else {
+        await Share.shareXFiles(
+          [xFile],
+          text: _getLocalizedString('encryptedAudio'),
+        );
+      }
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('ERROR [AudioEncoderProvider.shareEncodedAudio]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
+      debugPrint('ERROR File path: ${selectedAudioToEncode?.path}');
       notifyListeners();
     }
   }
@@ -337,13 +436,43 @@ class AudioEncoderProvider extends ChangeNotifier {
     }
 
     try {
-      await Share.shareXFiles(
-        [XFile(selectedAudioToDecode!.path)],
-        text: _getLocalizedString('decryptedAudio'),
+      // Determine mimeType based on file extension
+      String mimeType = 'audio/m4a';
+      final extension = selectedAudioToDecode!.path.split('.').last.toLowerCase();
+      if (extension == 'm4a') {
+        mimeType = 'audio/m4a';
+      } else if (extension == 'mp3') {
+        mimeType = 'audio/mpeg';
+      } else if (extension == 'wav') {
+        mimeType = 'audio/wav';
+      } else if (extension == 'aac') {
+        mimeType = 'audio/aac';
+      }
+      
+      final xFile = XFile(
+        selectedAudioToDecode!.path,
+        mimeType: mimeType,
       );
+      
+      if (Platform.isIOS) {
+        // iOS requires sharePositionOrigin for iPad
+        await Share.shareXFiles(
+          [xFile],
+          text: _getLocalizedString('decryptedAudio'),
+          sharePositionOrigin: const Rect.fromLTWH(0, 0, 100, 100),
+        );
+      } else {
+        await Share.shareXFiles(
+          [xFile],
+          text: _getLocalizedString('decryptedAudio'),
+        );
+      }
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('ERROR [AudioEncoderProvider.shareDecodedAudio]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
+      debugPrint('ERROR File path: ${selectedAudioToDecode?.path}');
       notifyListeners();
     }
   }
@@ -383,6 +512,8 @@ class AudioEncoderProvider extends ChangeNotifier {
     } catch (e) {
       _errorMessage =
           '${_getLocalizedString('errorSavingFile')}: ${e.toString().replaceAll('Exception: ', '')}';
+      debugPrint('ERROR [AudioEncoderProvider.saveEncodedAudio]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       notifyListeners();
     }
   }
@@ -431,6 +562,8 @@ class AudioEncoderProvider extends ChangeNotifier {
     } catch (e) {
       _errorMessage =
           '${_getLocalizedString('errorSavingFile')}: ${e.toString().replaceAll('Exception: ', '')}';
+      debugPrint('ERROR [AudioEncoderProvider.saveDecodedAudio]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       notifyListeners();
     }
   }

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
@@ -53,6 +54,8 @@ class ImageEncoderProvider extends ChangeNotifier {
       }
     } catch (e) {
       _errorMessage = '${_getLocalizedString('errorSelectingImage')}: $e';
+      debugPrint('ERROR [ImageEncoderProvider.pickImageToEncode]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       notifyListeners();
     }
   }
@@ -71,6 +74,8 @@ class ImageEncoderProvider extends ChangeNotifier {
       }
     } catch (e) {
       _errorMessage = '${_getLocalizedString('errorSelectingImage')}: $e';
+      debugPrint('ERROR [ImageEncoderProvider.pickImageToDecode]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       notifyListeners();
     }
   }
@@ -127,6 +132,8 @@ class ImageEncoderProvider extends ChangeNotifier {
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('ERROR [ImageEncoderProvider.encodeImage]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       isEncoded = false; // Only reset on error
     } finally {
       isLoadingEncode = false;
@@ -168,6 +175,8 @@ class ImageEncoderProvider extends ChangeNotifier {
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('ERROR [ImageEncoderProvider.decodeImage]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       isDecoded = false; // Only reset on error
     } finally {
       isLoadingDecode = false;
@@ -187,6 +196,8 @@ class ImageEncoderProvider extends ChangeNotifier {
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('ERROR [ImageEncoderProvider.saveEncodedImage]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       notifyListeners();
     }
   }
@@ -203,6 +214,8 @@ class ImageEncoderProvider extends ChangeNotifier {
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('ERROR [ImageEncoderProvider.saveDecodedImage]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       notifyListeners();
     }
   }
@@ -215,13 +228,30 @@ class ImageEncoderProvider extends ChangeNotifier {
     }
 
     try {
-      await Share.shareXFiles(
-        [XFile(selectedImageToEncode!.path)],
-        text: _getLocalizedString('encryptedImage'),
+      final xFile = XFile(
+        selectedImageToEncode!.path,
+        mimeType: 'image/png',
       );
+      
+      if (Platform.isIOS) {
+        // iOS requires sharePositionOrigin for iPad
+        await Share.shareXFiles(
+          [xFile],
+          text: _getLocalizedString('encryptedImage'),
+          sharePositionOrigin: const Rect.fromLTWH(0, 0, 100, 100),
+        );
+      } else {
+        await Share.shareXFiles(
+          [xFile],
+          text: _getLocalizedString('encryptedImage'),
+        );
+      }
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('ERROR [ImageEncoderProvider.shareEncodedImage]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
+      debugPrint('ERROR File path: ${selectedImageToEncode?.path}');
       notifyListeners();
     }
   }
@@ -234,13 +264,30 @@ class ImageEncoderProvider extends ChangeNotifier {
     }
 
     try {
-      await Share.shareXFiles(
-        [XFile(selectedImageToDecode!.path)],
-        text: _getLocalizedString('decryptedImage'),
+      final xFile = XFile(
+        selectedImageToDecode!.path,
+        mimeType: 'image/png',
       );
+      
+      if (Platform.isIOS) {
+        // iOS requires sharePositionOrigin for iPad
+        await Share.shareXFiles(
+          [xFile],
+          text: _getLocalizedString('decryptedImage'),
+          sharePositionOrigin: const Rect.fromLTWH(0, 0, 100, 100),
+        );
+      } else {
+        await Share.shareXFiles(
+          [xFile],
+          text: _getLocalizedString('decryptedImage'),
+        );
+      }
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('ERROR [ImageEncoderProvider.shareDecodedImage]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
+      debugPrint('ERROR File path: ${selectedImageToDecode?.path}');
       notifyListeners();
     }
   }

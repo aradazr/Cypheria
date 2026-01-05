@@ -325,6 +325,34 @@ class _AudioEncoderLayoutState extends State<AudioEncoderLayout>
                     await Future.delayed(const Duration(milliseconds: 100));
                   }
                   await provider.startRecording();
+                  
+                  // Show error message with settings button if permission is permanently denied
+                  if (provider.errorMessage != null && context.mounted) {
+                    if (provider.isPermissionPermanentlyDenied) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(provider.errorMessage!),
+                          duration: const Duration(seconds: 5),
+                          backgroundColor: Colors.red,
+                          action: SnackBarAction(
+                            label: Localizations.localeOf(context).languageCode == 'fa' ? 'تنظیمات' : 'Settings',
+                            textColor: Colors.white,
+                            onPressed: () {
+                              provider.openSettings();
+                            },
+                          ),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(provider.errorMessage!),
+                          duration: const Duration(seconds: 3),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
                 },
           child: AnimatedBuilder(
             animation: _scaleAnimation,

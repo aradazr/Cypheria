@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../core/localization/app_localizations.dart';
@@ -73,6 +74,8 @@ class FileEncoderProvider extends ChangeNotifier {
       }
     } catch (e) {
       _errorMessage = 'خطا در انتخاب فایل: $e';
+      debugPrint('ERROR [FileEncoderProvider.pickFileToEncode]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       notifyListeners();
     }
   }
@@ -97,6 +100,8 @@ class FileEncoderProvider extends ChangeNotifier {
       }
     } catch (e) {
       _errorMessage = '${_getLocalizedString('errorSelectingFile')}: $e';
+      debugPrint('ERROR [FileEncoderProvider.pickFileToDecode]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       notifyListeners();
     }
   }
@@ -161,6 +166,8 @@ class FileEncoderProvider extends ChangeNotifier {
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('ERROR [FileEncoderProvider.encodeFile]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       isEncoded = false; // Only reset on error
     } finally {
       isLoadingEncode = false;
@@ -206,6 +213,8 @@ class FileEncoderProvider extends ChangeNotifier {
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('ERROR [FileEncoderProvider.decodeFile]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       isDecoded = false; // Only reset on error
     } finally {
       isLoadingDecode = false;
@@ -249,6 +258,8 @@ class FileEncoderProvider extends ChangeNotifier {
     } catch (e) {
       _errorMessage =
           '${_getLocalizedString('errorSavingFile')}: ${e.toString().replaceAll('Exception: ', '')}';
+      debugPrint('ERROR [FileEncoderProvider.saveEncodedFile]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       notifyListeners();
     }
   }
@@ -294,6 +305,8 @@ class FileEncoderProvider extends ChangeNotifier {
     } catch (e) {
       _errorMessage =
           '${_getLocalizedString('errorSavingFile')}: ${e.toString().replaceAll('Exception: ', '')}';
+      debugPrint('ERROR [FileEncoderProvider.saveDecodedFile]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
       notifyListeners();
     }
   }
@@ -306,13 +319,41 @@ class FileEncoderProvider extends ChangeNotifier {
     }
 
     try {
-      await Share.shareXFiles(
-        [XFile(selectedFileToEncode!.path)],
-        text: _getLocalizedString('encryptedFile'),
+      // Determine mimeType based on file extension
+      String mimeType = 'application/octet-stream';
+      final extension = selectedFileToEncode!.path.split('.').last.toLowerCase();
+      if (extension == 'txt' || extension == 'text') {
+        mimeType = 'text/plain';
+      } else if (extension == 'pdf') {
+        mimeType = 'application/pdf';
+      } else if (extension == 'zip' || extension == 'rar') {
+        mimeType = 'application/zip';
+      }
+      
+      final xFile = XFile(
+        selectedFileToEncode!.path,
+        mimeType: mimeType,
       );
+      
+      if (Platform.isIOS) {
+        // iOS requires sharePositionOrigin for iPad
+        await Share.shareXFiles(
+          [xFile],
+          text: _getLocalizedString('encryptedFile'),
+          sharePositionOrigin: const Rect.fromLTWH(0, 0, 100, 100),
+        );
+      } else {
+        await Share.shareXFiles(
+          [xFile],
+          text: _getLocalizedString('encryptedFile'),
+        );
+      }
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('ERROR [FileEncoderProvider.shareEncodedFile]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
+      debugPrint('ERROR File path: ${selectedFileToEncode?.path}');
       notifyListeners();
     }
   }
@@ -332,13 +373,45 @@ class FileEncoderProvider extends ChangeNotifier {
     }
 
     try {
-      await Share.shareXFiles(
-        [XFile(selectedFileToDecode!.path)],
-        text: _getLocalizedString('decryptedFile'),
+      // Determine mimeType based on file extension
+      String mimeType = 'application/octet-stream';
+      final extension = selectedFileToDecode!.path.split('.').last.toLowerCase();
+      if (extension == 'txt' || extension == 'text') {
+        mimeType = 'text/plain';
+      } else if (extension == 'pdf') {
+        mimeType = 'application/pdf';
+      } else if (extension == 'zip' || extension == 'rar') {
+        mimeType = 'application/zip';
+      } else if (extension == 'jpg' || extension == 'jpeg') {
+        mimeType = 'image/jpeg';
+      } else if (extension == 'png') {
+        mimeType = 'image/png';
+      }
+      
+      final xFile = XFile(
+        selectedFileToDecode!.path,
+        mimeType: mimeType,
       );
+      
+      if (Platform.isIOS) {
+        // iOS requires sharePositionOrigin for iPad
+        await Share.shareXFiles(
+          [xFile],
+          text: _getLocalizedString('decryptedFile'),
+          sharePositionOrigin: const Rect.fromLTWH(0, 0, 100, 100),
+        );
+      } else {
+        await Share.shareXFiles(
+          [xFile],
+          text: _getLocalizedString('decryptedFile'),
+        );
+      }
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
+      debugPrint('ERROR [FileEncoderProvider.shareDecodedFile]: $_errorMessage');
+      debugPrint('ERROR StackTrace: ${StackTrace.current}');
+      debugPrint('ERROR File path: ${selectedFileToDecode?.path}');
       notifyListeners();
     }
   }

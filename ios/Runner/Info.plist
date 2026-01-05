@@ -46,14 +46,14 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>برای انتخاب تصاویر از گالری نیاز به دسترسی داریم</string>
+	<string>We need access to select images from the gallery</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>برای ذخیره تصاویر در گالری نیاز به دسترسی داریم</string>
+	<string>We need access to save images to the gallery</string>
 	<key>NSCameraUsageDescription</key>
-	<string>برای گرفتن عکس از دوربین نیاز به دسترسی داریم</string>
+	<string>We need access to take photos with the camera</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>برای ضبط صدا و تبدیل صدا به متن نیاز به دسترسی به میکروفون داریم</string>
+	<string>We need access to the microphone to record audio and convert speech to text</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>برای تبدیل صدا به متن نیاز به دسترسی به تشخیص گفتار داریم</string>
+	<string>We need access to speech recognition to convert speech to text</string>
 </dict>
 </plist>

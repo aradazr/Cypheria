@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +26,10 @@ class _TextEncoderLayoutState extends State<TextEncoderLayout> {
       final locale = Localizations.localeOf(context);
       final provider = Provider.of<TextEncoderProvider>(context, listen: false);
       provider.setLocale(locale);
-      provider.initializeSpeech();
+      // Only initialize speech on Android (iOS doesn't support Persian)
+      if (Platform.isAndroid) {
+        provider.initializeSpeech();
+      }
       _speechInitialized = true;
     }
   }
@@ -71,7 +76,8 @@ class _TextEncoderLayoutState extends State<TextEncoderLayout> {
               textInputAction: TextInputAction.done,
               onSubmitted: () => provider.process(context),
               errorText: provider.errorMessage,
-              onMicrophoneTap: () => provider.startListening(),
+              // Only show microphone button on Android (iOS doesn't support Persian)
+              onMicrophoneTap: Platform.isAndroid ? () => provider.startListening() : null,
               isListening: provider.isListening,
             ),
             SizedBox(height: Responsive.spacing(context, 20, 24, 28)),

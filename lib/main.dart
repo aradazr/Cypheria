@@ -33,6 +33,17 @@ class MyApp extends StatelessWidget {
       ],
       child: Consumer2<LanguageProvider, ThemeProvider>(
         builder: (context, languageProvider, themeProvider, child) {
+          // Show loading while settings are being loaded
+          if (languageProvider.isLoading || themeProvider.isLoading) {
+            return MaterialApp(
+              title: 'Cypheria',
+              debugShowCheckedModeBanner: false,
+              home: const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              ),
+            );
+          }
+
           return MaterialApp(
             title: 'Cypheria',
             debugShowCheckedModeBanner: false,
@@ -47,6 +58,19 @@ class MyApp extends StatelessWidget {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: const [Locale('fa', 'IR'), Locale('en', 'US')],
+            builder: (context, child) {
+              // Disable system font scaling to prevent font size/weight changes
+              // This ensures the app font is not affected by device font settings
+              return MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  boldText: false,
+                  textScaler: TextScaler.linear(
+                    1.0,
+                  ), // Disable bold text from system settings
+                ),
+                child: child!,
+              );
+            },
             home: const AppWrapper(),
           );
         },
